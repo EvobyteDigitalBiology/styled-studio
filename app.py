@@ -25,8 +25,16 @@ def get_updated_theme_config():
         if key.startswith("theme-") and not key.endswith("-default"):
             default_key = f"{key}-default"
             if st.session_state[key] != st.session_state.get(default_key, None):
-                updated_config[key] = st.session_state[key]
-    
+                
+                # Format correctly for toml
+                if isinstance(st.session_state[key], bool):
+                    updated_config[key] = "true" if st.session_state[key] else "false"
+                elif isinstance(st.session_state[key], tuple):
+                    size_value, size_unit = st.session_state[key]
+                    updated_config[key] = f'\"{size_value}{size_unit}\"'
+                else:
+                    updated_config[key] = f'\"{st.session_state[key]}\"'
+
     return updated_config
 
 
@@ -71,7 +79,8 @@ def set_config_toml(template_path: str, updated_themes: dict) -> str:
             config_key_form = f"{form_type}-{config_key}"
 
             if config_key_form in updated_themes:
-                key_line = f"{config_key} = \"{updated_themes[config_key_form]}\""
+
+                key_line = f"{config_key} = {updated_themes[config_key_form]}"
                 config_lines_update.append(key_line)
 
                 if form_type == "theme":
