@@ -32,6 +32,9 @@ def get_updated_theme_config():
                 elif isinstance(st.session_state[key], tuple):
                     size_value, size_unit = st.session_state[key]
                     updated_config[key] = f'\"{size_value}{size_unit}\"'
+                
+                elif isinstance(st.session_state[key], int):
+                    updated_config[key] = f'{st.session_state[key]}'
                 else:
                     updated_config[key] = f'\"{st.session_state[key]}\"'
 
