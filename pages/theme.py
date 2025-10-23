@@ -6,62 +6,13 @@ import st_yled
 import uiconfig
 import converters
 
-if not 'theme-primaryColor' in st.session_state:
-    st.session_state['theme-primaryColor'] = uiconfig.PRIMARY_COLOR_DEFAULT
 
-# Define session state
-if not 'theme-backgroundColor' in st.session_state:
-    st.session_state['theme-backgroundColor'] = uiconfig.BACKGROUND_COLOR_DEFAULT
-
-if not 'theme-secondaryBackgroundColor' in st.session_state:
-    st.session_state['theme-secondaryBackgroundColor'] = uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT
-
-if not 'theme-textColor' in st.session_state:
-    st.session_state['theme-textColor'] = uiconfig.TEXT_COLOR_DEFAULT
-
-if not 'theme-linkColor' in st.session_state:
-    st.session_state['theme-linkColor'] = uiconfig.LINK_COLOR_DEFAULT
-
-if not 'theme-codeBackgroundColor' in st.session_state:
-    st.session_state['theme-codeBackgroundColor'] = uiconfig.CODE_BG_COLOR_DEFAULT
-
-if not 'theme-borderColor' in st.session_state:
-    st.session_state['theme-borderColor'] = uiconfig.BORDER_COLOR_DEFAULT
-
-if not 'theme-dataframeBorderColor' in st.session_state:
-    st.session_state['theme-dataframeBorderColor'] = uiconfig.DATAFRAME_BORDER_COLOR_DEFAULT
-
-if not 'theme-dataframeHeaderBackgroundColor' in st.session_state:
-    st.session_state['theme-dataframeHeaderBackgroundColor'] = uiconfig.DATAFRAME_HEADER_BG_COLOR_DEFAULT
-
-# SIDEBAR session state variables
-if not 'theme-sidebar-primaryColor' in st.session_state:
-    st.session_state['theme-sidebar-primaryColor'] = uiconfig.SIDEBAR_PRIMARY_COLOR_DEFAULT
-
-if not 'theme-sidebar-backgroundColor' in st.session_state:
-    st.session_state['theme-sidebar-backgroundColor'] = uiconfig.SIDEBAR_BACKGROUND_COLOR_DEFAULT
-
-if not 'theme-sidebar-secondaryBackgroundColor' in st.session_state:
-    st.session_state['theme-sidebar-secondaryBackgroundColor'] = uiconfig.SIDEBAR_SECONDARY_BACKGROUND_COLOR_DEFAULT
-
-if not 'theme-sidebar-textColor' in st.session_state:
-    st.session_state['theme-sidebar-textColor'] = uiconfig.SIDEBAR_TEXT_COLOR_DEFAULT
-
-if not 'theme-sidebar-linkColor' in st.session_state:
-    st.session_state['theme-sidebar-linkColor'] = uiconfig.SIDEBAR_LINK_COLOR_DEFAULT
-
-if not 'theme-sidebar-codeBackgroundColor' in st.session_state:
-    st.session_state['theme-sidebar-codeBackgroundColor'] = uiconfig.SIDEBAR_CODE_BG_COLOR_DEFAULT
-
-if not 'theme-sidebar-borderColor' in st.session_state:
-    st.session_state['theme-sidebar-borderColor'] = uiconfig.SIDEBAR_BORDER_COLOR_DEFAULT
-
-if not 'theme-sidebar-dataframeBorderColor' in st.session_state:
-    st.session_state['theme-sidebar-dataframeBorderColor'] = uiconfig.SIDEBAR_DATAFRAME_BORDER_COLOR_DEFAULT
-
-if not 'theme-sidebar-dataframeHeaderBackgroundColor' in st.session_state:
-    st.session_state['theme-sidebar-dataframeHeaderBackgroundColor'] = uiconfig.SIDEBAR_DATAFRAME_HEADER_BG_COLOR_DEFAULT
-
+def init_theme_session_state(key: str, default_value: str):
+    """Initialize session state variables for theme settings with default values."""
+    
+    if key not in st.session_state:
+        st.session_state[key] = default_value
+        st.session_state[f'{key}-default'] = default_value
 
 def update_st_from_input(theme_property: str, input_selector_key: str):
     st.session_state[theme_property] = st.session_state[input_selector_key]
@@ -106,29 +57,52 @@ def theme_color_picker(theme_property: str,
         color_picker = st.color_picker(
             f"Pick {label}",
             value=display_color,
-            key=session_state_key + "-picker",
+            key=theme_property + "-picker",
             label_visibility = "collapsed",
             on_change=update_st_from_input,
-            args=(session_state_key, session_state_key + "-picker"),
+            args=(session_state_key, theme_property + "-picker"),
         )
 
         st_yled.caption("Select Color", width=100)
 
 
-st.markdown("**> Theme** Configure global styling of your Streamlit App")
+# Initialize main theme session state
+init_theme_session_state('theme-primaryColor', uiconfig.PRIMARY_COLOR_DEFAULT)
+init_theme_session_state('theme-backgroundColor', uiconfig.BACKGROUND_COLOR_DEFAULT)
+init_theme_session_state('theme-secondaryBackgroundColor', uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT)
+init_theme_session_state('theme-textColor', uiconfig.TEXT_COLOR_DEFAULT)
+init_theme_session_state('theme-linkColor', uiconfig.LINK_COLOR_DEFAULT)
+init_theme_session_state('theme-codeBackgroundColor', uiconfig.CODE_BG_COLOR_DEFAULT)
+init_theme_session_state('theme-borderColor', uiconfig.BORDER_COLOR_DEFAULT)
+init_theme_session_state('theme-dataframeBorderColor', uiconfig.DATAFRAME_BORDER_COLOR_DEFAULT)
+init_theme_session_state('theme-dataframeHeaderBackgroundColor', uiconfig.DATAFRAME_HEADER_BG_COLOR_DEFAULT)
 
+# Initialize sidebar theme session state
+init_theme_session_state('theme-sidebar-primaryColor', uiconfig.SIDEBAR_PRIMARY_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-backgroundColor', uiconfig.SIDEBAR_BACKGROUND_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-secondaryBackgroundColor', uiconfig.SIDEBAR_SECONDARY_BACKGROUND_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-textColor', uiconfig.SIDEBAR_TEXT_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-linkColor', uiconfig.SIDEBAR_LINK_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-codeBackgroundColor', uiconfig.SIDEBAR_CODE_BG_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-borderColor', uiconfig.SIDEBAR_BORDER_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-dataframeBorderColor', uiconfig.SIDEBAR_DATAFRAME_BORDER_COLOR_DEFAULT)
+init_theme_session_state('theme-sidebar-dataframeHeaderBackgroundColor', uiconfig.SIDEBAR_DATAFRAME_HEADER_BG_COLOR_DEFAULT)
+
+
+# region UI
+
+st.markdown("**> Theme** Configure global styling of your Streamlit App")
 
 tab_color, tab_font, tab_border, tab_sidebar = st_yled.tabs(
     ["Color", "Font", "Border", "Radius"],
     key = "theme-tabs"
 )
 
-
 with tab_color:
 
     frame_type = st_yled.radio("Frame Type",
                                 options=[":material/width_full: Main", ":material/side_navigation: Sidebar"],
-                                key="theme-frame-type",
+                                key="frame-type-radio",
                                 horizontal=True,
                                 label_visibility="collapsed",
                                 font_size='14px')
