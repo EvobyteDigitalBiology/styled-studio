@@ -97,7 +97,9 @@ def theme_size_input(theme_property: str,
                         label: str,
                         label_font_size: str = '20px',
                         label_field_width: int = 140,
-                        frame_type: Literal["main", "sidebar"] = "main"):
+                        allowed_units: list[str] = ['px', 'rem'],
+                        frame_type: Literal["main", "sidebar"] = "main",
+                        return_value_type: Literal["tuple", "int"] = "tuple"):
     
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
@@ -106,7 +108,12 @@ def theme_size_input(theme_property: str,
     
     # Get current value tuple or parse from string
     current_value = st.session_state[session_state_key]
-    current_number, current_unit = current_value
+
+    if return_value_type == "tuple":
+        current_number, current_unit = current_value
+    else:
+        current_number = current_value
+        current_unit = allowed_units[0]  # Default to first allowed unit
 
     with st.container(horizontal=True, vertical_alignment="center", width=400):
 
@@ -116,27 +123,128 @@ def theme_size_input(theme_property: str,
         number_value = st.number_input(
             f"Set {label} value",
             value=current_number,
-            min_value=0.0,
-            step=0.1 if current_unit == 'rem' else 1.0,
+            min_value=0.0 if current_unit == 'rem' else 0,
+            step=0.1 if current_unit == 'rem' else 1,
             key=theme_property + "-number",
             label_visibility="collapsed",
         )
 
+        index_select = allowed_units.index(current_unit)
+        unit_disabled = True if len(allowed_units) == 1 else False
+
         # Unit selectbox
         unit_value = st.selectbox(
             f"Set {label} unit",
-            options=['px', 'rem'],
-            index=0 if current_unit == 'px' else 1,
+            options=allowed_units,
+            index=index_select,
             key=theme_property + "-unit",
             label_visibility="collapsed",
             width=90,
+            disabled=unit_disabled
         )
         
         number_value = round(number_value,1)
 
         # Update session state with tuple value
-        new_value = (number_value, unit_value)
+        if return_value_type == "int":
+            new_value = int(number_value)
+        else:
+            new_value = (number_value, unit_value)
+
         st.session_state[session_state_key] = new_value
+
+
+def theme_font_input(theme_property: str,
+                        label: str,
+                        label_font_size: str = '20px',
+                        label_field_width: int = 140,
+                        frame_type: Literal["main", "sidebar"] = "main"):
+    
+    if frame_type == "sidebar":
+        theme_property = "sidebar-" + theme_property
+    
+    session_state_key = f"theme-{theme_property}"
+    
+    # Get current value tuple or parse from string
+    current_value = st.session_state[session_state_key]
+    
+    with st.container(horizontal=True, vertical_alignment="bottom"):
+
+        st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
+
+        options = ['sans-serif', 'serif', 'monospace', 'Google Fonts']
+        index_select = options.index(current_value) if current_value in options else 3
+
+        # Number input
+        font_value = st.selectbox(
+            "",
+            options=options,
+            index=index_select,
+            key=theme_property + "-font-select",
+            width=150,
+        )
+
+        if font_value == "Google Fonts":
+            
+            if current_value not in options:
+                current_value = current_value.split(":")
+                family_name_value = current_value[0].strip("'")
+                font_url_value = ':'.join(current_value[1:])
+            else:
+                family_name_value, font_url_value = '', ''
+
+            family_name = st.text_input(
+                f"Name",
+                value=family_name_value,
+                key=theme_property + "-font-family",
+                width=100,
+            )
+
+            font_url = st.text_input(
+                "Google Fonts URL",
+                value=font_url_value,
+                key=theme_property + "-font-url",
+                help= "More information on \n[Google Fonts in Streamlit](https://docs.streamlit.io/develop/tutorials/configuration-and-theming/external-fonts)",
+                width=240,
+            )
+
+            font_value = f"\'{family_name}\':{font_url}"
+
+        # Update session state with tuple value
+        st.session_state[session_state_key] = font_value
+
+
+def theme_weight_input(theme_property: str,
+                        label: str,
+                        label_font_size: str = '20px',
+                        label_field_width: int = 140,
+                        frame_type: Literal["main", "sidebar"] = "main"):
+    
+    if frame_type == "sidebar":
+        theme_property = "sidebar-" + theme_property
+    
+    session_state_key = f"theme-{theme_property}"
+    
+    # Get current value tuple or parse from string
+    current_value = st.session_state[session_state_key]
+
+    with st.container(horizontal=True, vertical_alignment="center", width=400):
+
+        st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
+
+        # Number input
+        number_value = st.number_input(
+            f"Set {label} value",
+            value=current_value,
+            min_value=100,
+            max_value=600,
+            step=100,
+            key=theme_property + "-number",
+            label_visibility="collapsed",
+            width=138,
+        )
+
+        st.session_state[session_state_key] = number_value
 
 
 # Initialize main theme session state
@@ -175,6 +283,24 @@ init_theme_session_state('theme-buttonRadius', uiconfig.BUTTON_RADIUS_DEFAULT)
 # Initialize sidebar radius theme session state
 init_theme_session_state('theme-sidebar-baseRadius', uiconfig.SIDEBAR_BASE_RADIUS_DEFAULT)
 init_theme_session_state('theme-sidebar-buttonRadius', uiconfig.SIDEBAR_BUTTON_RADIUS_DEFAULT)
+
+# Initialize sidebar font theme session state
+init_theme_session_state('theme-font', uiconfig.FONT_DEFAULT)
+init_theme_session_state('theme-headingFont', uiconfig.HEADING_FONT_DEFAULT)
+init_theme_session_state('theme-baseFontSize', uiconfig.BASE_FONT_SIZE_DEFAULT)
+init_theme_session_state('theme-baseFontWeight', uiconfig.BASE_FONT_WEIGHT_DEFAULT)
+
+init_theme_session_state('theme-codeFont', uiconfig.CODE_FONT_DEFAULT)
+init_theme_session_state('theme-codeFontSize', uiconfig.CODE_FONT_SIZE_DEFAULT)
+init_theme_session_state('theme-codeFontWeight', uiconfig.CODE_FONT_WEIGHT_DEFAULT)
+
+init_theme_session_state('theme-sidebar-font', uiconfig.SIDEBAR_FONT_DEFAULT)
+init_theme_session_state('theme-sidebar-headingFont', uiconfig.SIDEBAR_HEADING_FONT_DEFAULT)
+
+init_theme_session_state('theme-sidebar-codeFont', uiconfig.SIDEBAR_CODE_FONT_DEFAULT)
+init_theme_session_state('theme-sidebar-codeFontSize', uiconfig.SIDEBAR_CODE_FONT_SIZE_DEFAULT)
+init_theme_session_state('theme-sidebar-codeFontWeight', uiconfig.SIDEBAR_CODE_FONT_WEIGHT_DEFAULT)
+
 
 
 
@@ -309,6 +435,53 @@ with tab_color:
                 st_yled.code("# Code Background\nprint(\"Hello\")", background_color=st.session_state[f'{preview_selector_prefix}-codeBackgroundColor'],)
 
 
+
+with tab_font:
+
+    frame_type = utils.segmented_control_toggle(":material/width_full: Main", ":material/side_navigation: Sidebar", key="theme-font-frame-type-toggle")
+
+    if frame_type == ":material/side_navigation: Sidebar":
+        frame_type_select = "sidebar"
+    else:
+        frame_type_select = "main"
+    
+    font_cont = st.container(key="theme-font-container")
+
+    with font_cont:
+
+        theme_font_input("font", "Base Font", frame_type=frame_type_select)
+
+        theme_font_input("headingFont", "Heading Font", frame_type=frame_type_select)
+        
+        st.write("")
+
+        if frame_type_select == "main":
+            
+            theme_size_input("baseFontSize", "Base Size", frame_type=frame_type_select, return_value_type="int", allowed_units=['px'])
+
+            st.write("")
+            st.write("")
+
+            theme_weight_input("baseFontWeight", "Base Weight", frame_type=frame_type_select)
+
+    st.write("")
+
+    with st.expander("More Font Options"):
+
+        font_ext_cont = st.container(key="theme-font-ext-container")
+        
+        with font_ext_cont:
+            
+            theme_font_input("codeFont", "Code Font", label_font_size='16px', label_field_width=120, frame_type=frame_type_select)
+
+            st.write("")
+
+            theme_size_input("codeFontSize", "Code Size", label_font_size='16px', label_field_width=120, frame_type=frame_type_select, return_value_type="tuple", allowed_units=['px', 'rem'])
+
+            st.write("")
+
+            theme_weight_input("codeFontWeight", "Code Weight", label_font_size='16px', label_field_width=120, frame_type=frame_type_select)
+
 with tab_border:
 
     frame_type = utils.segmented_control_toggle(":material/width_full: Main", ":material/side_navigation: Sidebar", key="theme-border-frame-type-toggle")
@@ -385,6 +558,8 @@ with tab_border:
                         st.write(" ")
 
 
+    
+
 with tab_radius:
 
     frame_type = utils.segmented_control_toggle(":material/width_full: Main", ":material/side_navigation: Sidebar", key="theme-radius-frame-type-toggle")
@@ -440,6 +615,7 @@ with tab_radius:
                 border-radius: {button_radius_val}{button_radius_unit};
             }}
             """
+
             st.html(f"<style>{css}</style>")
 
             st_yled.button(
