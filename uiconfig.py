@@ -1,4 +1,8 @@
 
+
+CONFIG_TOML_TEMPLATE_PATH = "assets/template_config.toml"
+
+# theme default values
 PRIMARY_COLOR_DEFAULT = "#ff4b4b"
 BACKGROUND_COLOR_DEFAULT = "#ffffff"
 SECONDARY_BACKGROUND_COLOR_DEFAULT = "#f0f2f6"
