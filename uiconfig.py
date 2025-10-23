@@ -37,3 +37,21 @@ BUTTON_RADIUS_DEFAULT = (0.5, 'rem')
 
 SIDEBAR_BASE_RADIUS_DEFAULT = (0.5, 'rem')
 SIDEBAR_BUTTON_RADIUS_DEFAULT = (0.5, 'rem')
+
+# theme values font
+
+FONT_DEFAULT = "sans-serif" # font 
+BASE_FONT_SIZE_DEFAULT = 16 # baseFontSize 
+BASE_FONT_WEIGHT_DEFAULT = 400 # baseFontWeight
+HEADING_FONT_DEFAULT = "sans-serif" # headingFont
+
+CODE_FONT_DEFAULT = "monospace" # codeFont 
+CODE_FONT_SIZE_DEFAULT = (14, 'px') # codeFontSize # Must be PX or REM
+CODE_FONT_WEIGHT_DEFAULT = 400 # codeFontWeight
+
+SIDEBAR_FONT_DEFAULT = "sans-serif" # font 
+SIDEBAR_HEADING_FONT_DEFAULT = "sans-serif" # headingFont
+
+SIDEBAR_CODE_FONT_DEFAULT = "monospace" # codeFont 
+SIDEBAR_CODE_FONT_SIZE_DEFAULT = (14, 'px') # codeFontSize # Must be PX or REM
+SIDEBAR_CODE_FONT_WEIGHT_DEFAULT = 400 # codeFontWeight
