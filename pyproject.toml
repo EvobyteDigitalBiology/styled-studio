@@ -26,7 +26,7 @@ dependencies = [
     "streamlit>=1.42.0",  # Add Streamlit peer dependency (minimum version 1.42)
     "pandas>=2.0.0,<3.0.0",
     "openpyxl>=3.1.5,<4.0.0",
-    "st-styled @ file:///home/jona/scribble/st-styled/dist/st_styled-0.0.3-py3-none-any.whl",
+    "st-styled @ git+https://github.com/EvobyteDigitalBiology/st-styled@v0.0.4"
 ]
 
 [project.optional-dependencies]
