@@ -1,12 +1,7 @@
-[theme]
-linkColor=
-dataframeBorderColor=
-dataframeHeaderBackgroundColor=
-[theme]
+[server]
+headless = true
 
-# The preset Streamlit theme that your custom theme inherits from.
-# 
-# This can be one of the following: "light" or "dark".
+
 [theme]
 
 base = "light"

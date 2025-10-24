@@ -3,6 +3,7 @@ import st_yled
 
 import uiconfig
 import re
+from urllib.parse import urlparse
 
 
 def get_updated_theme_config():
@@ -174,9 +175,13 @@ def export_config_toml():
     url = st.context.url
 
 
-    url = url.replace('http://', '').split('/')
+    parsed_url = urlparse(str(url))
+    if not parsed_url.scheme or not parsed_url.netloc:
+        st.error("Invalid URL format")
+        raise ValueError("Invalid URL format")
 
-    print(url)
+    path_parts = parsed_url.path.strip('/').split('/') if parsed_url.path.strip('/') else []
+    url = path_parts
 
     if len(url) == 1:
         export_page = "theme"
@@ -198,7 +203,7 @@ def export_config_toml():
 st_yled.init()
 
 theme_page = st.Page("pages/theme.py", title="Theme")
-element_page = st.Page("pages/elements.py", title="Element Styling")
+element_page = st.Page("pages/elements.py", title="Elements")
  
 pg = st.navigation([theme_page, element_page])
 
