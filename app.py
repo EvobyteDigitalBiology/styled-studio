@@ -184,7 +184,7 @@ def export_config_toml():
 
     print(url)
 
-    if url[0] == "theme":
+    if url[0] == "":
         export_page = "theme"
     elif url[0] == "elements":
         export_page = "elements"
