@@ -174,18 +174,19 @@ def export_config_toml():
 
     url = st.context.url
 
-
     parsed_url = urlparse(str(url))
     if not parsed_url.scheme or not parsed_url.netloc:
         st.error("Invalid URL format")
         raise ValueError("Invalid URL format")
 
-    path_parts = parsed_url.path.strip('/').split('/') if parsed_url.path.strip('/') else []
+    path_parts = parsed_url.path.strip('/').split('/')
     url = path_parts
 
-    if len(url) == 1:
+    print(url)
+
+    if url[0] == "theme":
         export_page = "theme"
-    elif url[1] == "elements":
+    elif url[0] == "elements":
         export_page = "elements"
     else:
         
