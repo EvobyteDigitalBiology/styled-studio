@@ -1260,3 +1260,5 @@ showWidgetBorder = true
 # earlier ones.
 # files = [ "/home/jona/.streamlit/secrets.toml", "/home/jona/projects/evobyte/styled-studio/.streamlit/secrets.toml",]
 
+
+base = "light"

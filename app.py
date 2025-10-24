@@ -3,6 +3,7 @@ import st_yled
 
 import uiconfig
 import re
+from urllib.parse import urlparse
 
 
 def get_updated_theme_config():
@@ -172,14 +173,27 @@ def render_export_theme(config_toml_template_path: str):
 def export_config_toml():
 
     url = st.context.url
-    url = url.replace('http://', '').split('/')
 
-    if len(url) == 1:
+    parsed_url = urlparse(str(url))
+    if not parsed_url.scheme or not parsed_url.netloc:
+        st.error("Invalid URL format")
+        raise ValueError("Invalid URL format")
+
+    path_parts = parsed_url.path.strip('/').split('/')
+    url = path_parts
+
+    print(url)
+
+    if url[0] == "":
         export_page = "theme"
-    elif url[1] == "elements":
+    elif url[0] == "elements":
         export_page = "elements"
     else:
+        
+        # TODO Fix Here
         st.error("Invalid Export Page Selected")
+        raise ValueError("Invalid URL")
+    
 
     if export_page == "theme":
         render_export_theme(uiconfig.CONFIG_TOML_TEMPLATE_PATH)
@@ -190,7 +204,7 @@ def export_config_toml():
 st_yled.init()
 
 theme_page = st.Page("pages/theme.py", title="Theme")
-element_page = st.Page("pages/elements.py", title="Element Styling")
+element_page = st.Page("pages/elements.py", title="Elements")
  
 pg = st.navigation([theme_page, element_page])
 
