@@ -1,6 +1,29 @@
 import streamlit as st
 import st_yled
 
+CATEGORY_SLUGS = {
+    "Write": "write",
+    "Text": "text",
+    "Data": "data",
+    "Chart": "chart",
+    "Input": "input",
+    "Media": "media",
+    "Layout": "layout",
+    "Chat": "chat",
+    "Status": "status",
+    "Execution": "execution",
+    "Navigation": "navigation",
+    "Configuration": "configuration",
+}
+
+def revert_category_slugs():
+    """Return a dictionary that maps slugs back to category names"""
+    return {slug: category for category, slug in CATEGORY_SLUGS.items()}
+
+    # Create reverse mapping from slug to category name
+    return {slug: category for category, slug in category_slugs.items()}
+
+
 def segmented_control_toggle(option1: str, option2: str, key: str, index: int = 0) -> str:
 
     css = f"""
@@ -50,3 +73,5 @@ def segmented_control_toggle(option1: str, option2: str, key: str, index: int = 
     return seg_control_select
     
     
+
+
