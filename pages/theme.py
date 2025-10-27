@@ -119,12 +119,12 @@ def theme_size_input(theme_property: str,
 
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
-        # Number input
+        # Number input // Operate on float
         number_value = st.number_input(
             f"Set {label} value",
-            value=current_number,
-            min_value=0.0 if current_unit == 'rem' else 0,
-            step=0.1 if current_unit == 'rem' else 1,
+            value=float(current_number),
+            min_value=0.0,
+            step=0.1 if current_unit == 'rem' else 1.0,
             key=theme_property + "-number",
             label_visibility="collapsed",
         )
