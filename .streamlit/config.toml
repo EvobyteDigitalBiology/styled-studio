@@ -358,7 +358,8 @@ headless = "true"
 # The preset Streamlit theme that your custom theme inherits from.
 # 
 # This can be one of the following: "light" or "dark".
-# base =
+
+base = "light"
 
 # Primary accent color.
 # primaryColor = 
@@ -1260,5 +1261,3 @@ showWidgetBorder = true
 # earlier ones.
 # files = [ "/home/jona/.streamlit/secrets.toml", "/home/jona/projects/evobyte/styled-studio/.streamlit/secrets.toml",]
 
-
-base = "light"
