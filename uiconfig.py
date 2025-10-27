@@ -26,6 +26,15 @@ element_type_format = {
     'tertiary': 'Tertiary',
 }
 
+css_properties_input_widget = {
+    'background_color': 'color_picker',
+    'color': 'color_picker',
+    'font_size': 'size_input',
+    'border_style': 'selectbox',
+    'border_color': 'color_picker',
+    'border_width': 'size_input',
+}
+
 # theme default values - COLOR
 PRIMARY_COLOR_DEFAULT = "#ff4b4b"
 BACKGROUND_COLOR_DEFAULT = "#ffffff"

@@ -1,8 +1,118 @@
+
+import uuid
 import st_yled
 import streamlit as st
 
 import uiconfig
 import utils
+
+import re
+
+def elements_color_picker(elements_key: str,
+                        label: str,
+                        label_font_size: str = '20px',
+                        label_field_width: int = 140):
+
+    if elements_key in st.session_state:
+        color_state_value = st.session_state[elements_key]
+        code_color = None
+    else:
+        color_state_value = "default"
+        code_color = "grey"
+
+    utils.base_color_picker(
+        key=elements_key,
+        label=label,
+        label_font_size=label_font_size,
+        label_field_width=label_field_width,
+        color_state_value=color_state_value,
+        code_color=code_color
+    )
+
+def elements_selectbox(key: str,
+                        label: str,
+                        options: list[str],
+                        label_font_size: str = '16px',
+                        label_field_width: int = 140):
+
+    with st.container(horizontal=True, vertical_alignment="center"):
+
+        st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
+
+        selected_option = st_yled.selectbox(
+            "Select an option",
+            options=options,
+            index=None,
+            key=key + "-selectbox",
+            label_visibility="collapsed",
+            on_change=utils.update_st_from_input,
+            args=(key, key + "-selectbox"),
+            width = 180
+        )
+
+        st_yled.caption("Select Option", width=100)
+
+
+def elements_size_input(key,
+                        label: str,
+                        allowed_units: list[str],
+                        unit_step_sizes: list[float],
+                        label_font_size: str = '16px',
+                        label_field_width: int = 140):
+
+    if key in st.session_state:
+        size_state_value = st.session_state[key]
+        
+        current_number = re.findall(r'\d+\.?\d*', size_state_value)[0]
+        current_number = float(current_number)
+        current_unit = re.findall(r'[a-zA-Z]+', size_state_value)[0]
+    else:
+        current_number = None
+        current_unit = allowed_units[0]
+
+    input_seed_key = key + "-seed"
+
+    if not input_seed_key in st.session_state:
+        st.session_state[input_seed_key] = str(uuid.uuid4())
+
+    step_size = unit_step_sizes[allowed_units.index(current_unit)]
+
+    utils.base_size_input(
+        key=key,
+        seed_value=st.session_state[input_seed_key],
+        label=label,
+        value=current_number,
+        step_size=step_size,
+        unit=current_unit,
+        allowed_units=allowed_units,
+        label_font_size=label_font_size,
+        label_field_width=label_field_width,
+        return_value_type='str'
+    )
+
+
+def get_input_widget_for_property(prop: str, key: str, display_name: str):
+
+    widget_type = uiconfig.css_properties_input_widget[prop]
+    
+    if widget_type == 'color_picker':
+        elements_color_picker(key, display_name, label_font_size='16px')
+    elif widget_type == 'size_input':
+        allowed_units = ['px', 'em', 'rem']
+        unit_step_sizes = [1.0, 0.1, 0.1]
+        elements_size_input(
+            key,
+            display_name,
+            allowed_units,
+            unit_step_sizes,
+            label_font_size='16px'
+        )
+    elif widget_type == 'selectbox':
+        if prop == 'border_style':
+            options = ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset']
+            elements_selectbox(key, display_name, options, label_font_size='16px')
+    else:
+        pass
 
 
 # region data
@@ -23,8 +133,8 @@ category_slug_display_map = utils.revert_category_slugs()
 # Get all display names for categories
 category_display_options = [category_slug_display_map[cat] for cat in category_options]
 
-# region UI
 
+# region UI
 st.markdown("**> Elements** Customize Streamlit components app elements")
 
 nav_cont = st.container(key="elements-nav-cont")
@@ -85,13 +195,6 @@ with st_yled.popover('Style element',
 
     with col1:
 
-        # search_select = st_yled.selectbox(
-        #     "Select element to style",
-        #     options=all_elements,
-        #     index=None,
-        #     key="elements-search-select"
-        # )
-
         col1_cat, col2_cat = col1.columns([1,2])
 
         with col1_cat:
@@ -146,6 +249,9 @@ for element_key in elements_display.keys():
 
     element_types = list(element_card_props['types'].keys())
     
+    element_name = element_card_props['name']
+
+    # Check if multiple types
     if len(element_types) == 1:
         type_selector = False
         type_select = element_types[0]
@@ -173,7 +279,7 @@ for element_key in elements_display.keys():
         col1, col2 = st.columns([1,2])
 
         with col1:
-            st.subheader('st.' + element_card_props['name'])
+            st.subheader('st_yled.' + element_name)
 
             # Check if multiple types
             if type_selector:
@@ -188,10 +294,22 @@ for element_key in elements_display.keys():
             else:
                 st.write("")
 
+            if type_selector:
+                element_key_base = 'element-' + element_name + "-" + type_select
+            else:
+                element_key_base = element_name
+            
             # Create example container
             with st_yled.container(horizontal_alignment="center"):
                 
                 kwargs = {}
+                # Extract all css properties for this element type
+                for key in st.session_state.keys():
+                    if key.startswith(element_key_base) and key.endswith("-value"):
+                        css_prop = key.replace(element_key_base + '-', "").replace('-value', "")
+                        css_value = st.session_state[key]
+                        kwargs[css_prop] = css_value
+                
                 eval(element_card_props['types'][type_select]['example'])
 
             st.button("Copy Code")
@@ -205,27 +323,12 @@ for element_key in elements_display.keys():
 
                 with tab:
 
-                    st.write(f"**{tabs_render[ix]} Properties**")
-
                     for prop in css_props:
                         if uiconfig.css_properties_tabs[prop] == tabs_render[ix]:
                             display_name = uiconfig.css_properties_display_name.get(prop, prop)
-                            
-                            
 
-                            st.write(display_name)
+                            element_key = element_key_base + f"-{prop}-value"
 
-                # with tab:
+                            get_input_widget_for_property(prop, element_key, display_name)
 
-                #     st.write(f"**{tab} Properties**")
-                    
-                #     # for prop in css_props:
-                #     #     if uiconfig.css_properties_tabs[prop] == tab:
-                #     #         display_name = uiconfig.css_properties_display_name.get(prop, prop)
-                #     #         current_value = element_card_props['types'][type_select]['css'][prop]
-                #     #         st_yled.text_input(
-                #     #             display_name,
-                #     #             value=current_value if current_value is not None else "",
-                #     #             key=f"element-{element_key}-{type_select}-{prop}-input",
-                #     #             label_visibility="visible"
-                #     #         )
+                            # Get the right display function and def

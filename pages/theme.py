@@ -86,33 +86,15 @@ def theme_color_picker(theme_property: str,
 
     color_is_default = color_state_value == st.session_state[session_state_key_default] 
 
-    with st.container(horizontal=True, vertical_alignment="center"):
+    code_color = 'grey' if color_is_default else None
 
-        st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
-
-        st_yled.code(
-                color_state_value,
-                language = None,
-                font_size='14px',
-                color='grey' if color_is_default else None,
-                width=124,
-            )
-
-        if color_state_value.startswith('#') and len(color_state_value) == 9:
-            display_color = converters.hex_with_alpha_to_hex(color_state_value)
-        else:
-            display_color = color_state_value
-
-        color_picker = st.color_picker(
-            f"Pick {label}",
-            value=display_color,
-            key=theme_property + "-picker",
-            label_visibility = "collapsed",
-            on_change=update_st_from_input,
-            args=(session_state_key, theme_property + "-picker"),
-        )
-
-        st_yled.caption("Select Color", width=100)
+    utils.base_color_picker(
+        key=theme_property,
+        label=label,
+        label_font_size=label_font_size,
+        label_field_width=label_field_width,
+        color_state_value=color_state_value,
+        code_color=code_color)
 
 
 def theme_checkbox(theme_property: str,
@@ -176,47 +158,20 @@ def theme_size_input(theme_property: str,
         current_number = current_value
         current_unit = allowed_units[0]  # Default to first allowed unit
 
-    with st.container(horizontal=True, vertical_alignment="center", width=400):
+    current_number = float(current_number)
 
-        st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
-
-        # Number input // Operate on float
-        number_value = st.number_input(
-            f"Set {label} value",
-            value=float(current_number),
-            min_value=0.0,
-            step=0.1 if current_unit == 'rem' else 1.0,
-            key=theme_property + "-number-" + st.session_state[input_seed_key],
-            label_visibility="collapsed",
-        )
-
-        index_select = allowed_units.index(current_unit)
-        unit_disabled = True if len(allowed_units) == 1 else False
-
-        # Unit selectbox
-        unit_value = st.selectbox(
-            f"Set {label} unit",
-            options=allowed_units,
-            index=index_select,
-            key=theme_property + "-unit-" + st.session_state[input_seed_key],
-            label_visibility="collapsed",
-            width=90,
-            disabled=unit_disabled
-        )
-        
-        number_value = round(number_value,1)
-
-        # Update session state with tuple value
-        if return_value_type == "int":
-            new_value = int(number_value)
-        else:
-            new_value = (number_value, unit_value)
-
-        st.session_state[session_state_key] = new_value
-
-        # Full reset for unit change
-        if current_unit != unit_value:
-            st.rerun()
+    utils.base_size_input(
+        key=session_state_key,
+        seed_value=st.session_state[input_seed_key],
+        label=label,
+        value=current_number,
+        step_size=0.1 if current_unit == 'rem' else 1.0,
+        unit=current_unit,
+        allowed_units=allowed_units,
+        label_font_size=label_font_size,
+        label_field_width=label_field_width,
+        return_value_type=return_value_type
+    )
 
 
 def theme_font_input(theme_property: str,
