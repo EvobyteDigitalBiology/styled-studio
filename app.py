@@ -182,8 +182,6 @@ def export_config_toml():
     path_parts = parsed_url.path.strip('/').split('/')
     url = path_parts
 
-    print(url)
-
     if url[0] == "":
         export_page = "theme"
     elif url[0] == "elements":
