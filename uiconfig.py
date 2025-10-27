@@ -2,6 +2,30 @@
 
 CONFIG_TOML_TEMPLATE_PATH = "assets/template_config.toml"
 
+css_properties_display_name = {
+    'background_color': 'Background Color',
+    'color': 'Text Color',
+    'font_size': 'Font Size',
+    'border_style': 'Border Style',
+    'border_color': 'Border Color',
+    'border_width': 'Border Width',
+}
+
+css_properties_tabs = {
+    'background_color': 'Color',
+    'color': 'Color',
+    'font_size': 'Font',
+    'border_style': 'Border',
+    'border_color': 'Border',
+    'border_width': 'Border',
+}
+
+element_type_format = {
+    'primary': 'Primary',
+    'secondary': 'Secondary (Default)',
+    'tertiary': 'Tertiary',
+}
+
 # theme default values - COLOR
 PRIMARY_COLOR_DEFAULT = "#ff4b4b"
 BACKGROUND_COLOR_DEFAULT = "#ffffff"
