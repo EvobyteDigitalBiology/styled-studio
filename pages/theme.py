@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 import streamlit as st
 import st_yled
@@ -6,6 +6,7 @@ import st_yled
 import uiconfig
 import converters
 import utils
+
 
 
 def init_theme_session_state(key: str, default_value: str):
@@ -158,7 +159,8 @@ def theme_font_input(theme_property: str,
                         label: str,
                         label_font_size: str = '20px',
                         label_field_width: int = 140,
-                        frame_type: Literal["main", "sidebar"] = "main"):
+                        frame_type: Literal["main", "sidebar"] = "main",
+                        key: Optional[str] = None):
     
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
@@ -167,8 +169,8 @@ def theme_font_input(theme_property: str,
     
     # Get current value tuple or parse from string
     current_value = st.session_state[session_state_key]
-    
-    with st.container(horizontal=True, vertical_alignment="bottom"):
+
+    with st.container(horizontal=True, vertical_alignment="center", key=key):
 
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
@@ -177,7 +179,7 @@ def theme_font_input(theme_property: str,
 
         # Number input
         font_value = st.selectbox(
-            "",
+            "Pick font",
             options=options,
             index=index_select,
             key=theme_property + "-font-select",
@@ -432,8 +434,7 @@ with st.container(key="theme-main-container"):
                             st_yled.markdown("", width=24)
 
                     
-
-
+    #region Font Tabs
     with tab_font:
 
         frame_type = utils.segmented_control_toggle(":material/width_full: Main", ":material/side_navigation: Sidebar", key="theme-font-frame-type-toggle")
@@ -447,24 +448,20 @@ with st.container(key="theme-main-container"):
 
         with font_cont:
 
-            theme_font_input("font", "Base Font", frame_type=frame_type_select)
+            theme_font_input("font", "Base Font", frame_type=frame_type_select, key="theme-base-font-input")
 
-            theme_font_input("headingFont", "Heading Font", frame_type=frame_type_select)
-            
-            st.write("")
+            theme_font_input("headingFont", "Heading Font", frame_type=frame_type_select, key="theme-heading-font-input")
 
             if frame_type_select == "main":
                 
                 theme_size_input("baseFontSize", "Base Size", frame_type=frame_type_select, return_value_type="int", allowed_units=['px'])
 
-                st.write("")
-                st.write("")
-
                 theme_weight_input("baseFontWeight", "Base Weight", frame_type=frame_type_select)
 
-        st.write("")
 
-        with st.expander("More Font Options"):
+        with st_yled.expander("More Font Options",
+                            key="theme-font-ext-expander",
+                            border_width='0px'):
 
             font_ext_cont = st.container(key="theme-font-ext-container")
             
@@ -472,11 +469,7 @@ with st.container(key="theme-main-container"):
                 
                 theme_font_input("codeFont", "Code Font", label_font_size='16px', label_field_width=120, frame_type=frame_type_select)
 
-                st.write("")
-
                 theme_size_input("codeFontSize", "Code Size", label_font_size='16px', label_field_width=120, frame_type=frame_type_select, return_value_type="tuple", allowed_units=['px', 'rem'])
-
-                st.write("")
 
                 theme_weight_input("codeFontWeight", "Code Weight", label_font_size='16px', label_field_width=120, frame_type=frame_type_select)
 
@@ -510,8 +503,8 @@ with st.container(key="theme-main-container"):
 
             with st_yled.container(
                 key="border-preview",
-                height=400,
                 background_color=st.session_state[f'{preview_selector_prefix}-backgroundColor'],
+                border = False
             ):
 
                 # Border Color Preview
@@ -522,15 +515,11 @@ with st.container(key="theme-main-container"):
 
                     st_yled.markdown("**Border Color**")
 
-                st.write("")
-
                 # Input Widget Border Preview
                 if st.session_state[f'{preview_selector_prefix}-showWidgetBorder']:
                     st_yled.text_input("Input Widget Border", border_width='2px', border_style='solid', border_color=st.session_state[f'{preview_selector_prefix}-borderColor'])
                 else:
                     st_yled.text_input("Input Widget Border")
-
-                st.write("")
 
                 # Sidebar Border Preview
                 if frame_type_select == "main":
@@ -555,8 +544,6 @@ with st.container(key="theme-main-container"):
                         ):
                             st.write(" ")
 
-
-        
 
     with tab_radius:
 
@@ -592,18 +579,17 @@ with st.container(key="theme-main-container"):
                 css = f"""
                 .st-key-radius-preview-base {{
                     border-radius: {base_radius_val}{base_radius_unit};
+                    width: calc(100% - 48px);
                 }}
                 """
                 st.html(f"<style>{css}</style>")
 
                 with st_yled.container(
                     key="radius-preview-base",
-                    height=60,
+                    height=68,
                     background_color=st.session_state[f'{preview_selector_prefix}-primaryColor'],
                 ):
-                    st_yled.markdown("**Base Radius**", color='#FFFFFF')
-
-                st.write("")
+                    st_yled.markdown("**Base Radius**", color='#FFFFFF', width='content')
 
                 button_radius_val = st.session_state[f'{preview_selector_prefix}-buttonRadius'][0]
                 button_radius_unit = st.session_state[f'{preview_selector_prefix}-buttonRadius'][1]

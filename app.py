@@ -213,6 +213,43 @@ st.set_page_config(page_title="st_yled studio",
 
 st.logo("assets/st_yled Logo.png", size="large")
 
+
+# region SIDEBAR FOOTER
+
+with st.sidebar.container(key="sidebar-footer-container"):
+    
+    st_yled.markdown("Getting started with your app", font_size="12px", color='#31333F99', key="sidebar-footer-getting-started-markdown")
+
+    st_yled.markdown("[st_yled Python Package](https://st-styled.evo-byte.com/)", font_size="14px")
+    
+    st_yled.markdown("For help and support", font_size="12px", color='#31333F99', key="sidebar-footer-help-markdown")
+
+    st_yled.markdown("[st_yled Community](https://github.com/EvobyteDigitalBiology/st-styled/discussions)", font_size="14px")
+    
+    st.write("")
+
+    with st.container(key="sidebar-footer-letter-container", horizontal=True, vertical_alignment="center",
+                    gap = "medium"):
+
+        st.image("assets/st_yled Logo.png", width=96)
+
+        st_yled.markdown("**styled studio**",
+                        font_size="14px",
+                        color='#31333F99',
+                        key="sidebar-footer-logo-side",
+                        width=48)
+
+    # st_yled.markdown("By [EVOBYTE](https://evo-byte.com)")
+    # st_yled.markdown("Get in touch for custom App development")
+
+
+
+
+
+
+
+# region HEADER
+
 sticky_header = st_yled.container(
     key="sticky-header",
     horizontal=True,
