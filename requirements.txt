@@ -1,0 +1,4 @@
+streamlit>=1.42.0
+pandas>=2.0.0,<3.0.0
+openpyxl>=3.1.5,<4.0.0
+st-styled @ git+https://github.com/EvobyteDigitalBiology/st-styled@v0.0.4

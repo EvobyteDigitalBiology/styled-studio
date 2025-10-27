@@ -42,12 +42,28 @@ div[data-testid="stSidebarCollapseButton"] {
     Theme Page
 */
 
-.st-key-theme-tabs {
-    margin-top: 24px;
+
+.st-key-theme-main-container {
+    gap: 40px;
+}
+
+.st-key-theme-main-container .stVerticalBlock {
+    gap: 40px;
+}
+
+.st-key-theme-main-container div[data-baseweb="tab-panel"] {
+    padding-top: 40px;
 }
 
 .st-key-theme-tabs p {
     font-weight: 500;
+}
+
+.st-key-color-preview {
+    gap: 8px !important;
+    padding: 16px;
+    padding-bottom: 32px;
+    border-radius: 2px;
 }
 
 .st-key-primary-color-preview {
@@ -80,8 +96,11 @@ div[data-testid="stSidebarCollapseButton"] {
 }
 
 .st-key-color-selectors {
-    margin-top: 40px;
-    gap: 2rem;
+    gap: 48px !important;
+}
+
+.st-key-theme-color-ext-expander {
+    border: none;
 }
 
 .st-key-theme-color-container,
@@ -94,11 +113,13 @@ div[data-testid="stSidebarCollapseButton"] {
 .st-key-color-ext-preview {
     padding: 16px 16px;
     margin-top: 16px;
+    gap: 48px !important;
+    border-radius: 2px;
 }
 
 .st-key-color-ext-selectors {
     padding: 16px 16px;
-    gap: 2rem;
+    gap: 48px !important;
 }
 
 .st-key-bordercolor-preview {
@@ -111,22 +132,21 @@ div[data-testid="stSidebarCollapseButton"] {
 }
 
 .st-key-dataframe-header-background-preview {
-    padding: 8px;
-    border-bottom: none !important;
+    border: none;
+    min-height: 36px;
+    border-radius: 0.5rem;
+    
 }
 
 .st-key-dataframe-border-color-preview {
-    min-height: 64px;
-    position: relative;
-    top: -19px;
+    min-height: 156px;
     padding: 8px;
     border-top: none !important;
+    z-index: 1000;
+    background-color: transparent;
+    border-radius: 0.5rem;
 }
 
-.st-key-dataframe-border-color-preview-text {
-    position: relative;
-    top: 19px;
-}
 
 div[data-testid="stExpanderDetails"] {
     padding: 0px;
@@ -170,5 +190,4 @@ Theme Export */
 .st-key-theme-font-ext-container {
     margin: 16px;
 }
-
 
