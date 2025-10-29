@@ -792,7 +792,7 @@ baseFontSize = 16
 
 # Whether to show a vertical separator between the sidebar and the main
 # content area.
-showSidebarBorder = true
+showSidebarBorder = false
 
 # An array of colors to use for categorical chart data.
 # 
