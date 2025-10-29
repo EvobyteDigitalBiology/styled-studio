@@ -2,7 +2,6 @@
 import uuid
 import re
 
-import pyperclip
 import streamlit as st
 from streamlit_split_button import split_button
 
@@ -89,7 +88,31 @@ def reset_element_styles(element_key_base: str):
         del st.session_state[key]
 
 
-def copy_element_styles_to_clipboard(element_name: str, element_key_base: str):
+# def copy_element_styles_to_clipboard(element_name: str, element_key_base: str):
+    
+#     # Get values for all associated session state keys
+#     keys_to_copy = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value")]
+
+#     # Extract properrties from keys
+#     all_args = []
+#     for key in keys_to_copy:
+#         key_parse = key.replace("-value", "").replace("element-", "")
+#         css_prop_format = key_parse.split("-")[-1]
+#         value = st.session_state[key]
+#         arg_str = f"{css_prop_format}=\"{value}\""
+#         all_args.append(arg_str)
+#     all_args_str = ", ".join(all_args)
+
+#     if all_args_str:
+#         python_cmd = f"st_yled.{element_name}(*, {all_args_str})"
+#     else:
+#         python_cmd = f"st_yled.{element_name}(*)"
+
+#     pyperclip.copy(python_cmd)
+#     st.toast("Element Python copied to clipboard", icon=":material/content_copy:")
+
+
+def get_element_styles_to_python(element_name: str, element_key_base: str):
     
     # Get values for all associated session state keys
     keys_to_copy = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value")]
@@ -109,8 +132,8 @@ def copy_element_styles_to_clipboard(element_name: str, element_key_base: str):
     else:
         python_cmd = f"st_yled.{element_name}(*)"
 
-    pyperclip.copy(python_cmd)
-    st.toast("Element Python copied to clipboard", icon=":material/content_copy:")
+    return python_cmd
+
 
 
 
@@ -463,21 +486,16 @@ with st.container(key="elements-main-container"):
                     key=st.session_state['element-card-split-' + element_hash],
                     options=["Remove", "Reset"]
                 )
-
-                if res == "Copy Python":
-                    copy_element_styles_to_clipboard(element_name, element_key_base)
-                    # Required to render new key for split button on action and reset state
-                    st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
-                elif res == "Remove":
+            
+                if res == "Remove":
 
                     # Make sure to delete variants if any
                     remove_element_from_selection(element_hash,element_key_base,element_name)
                     
-                    
-                    
                     # Required to render new key for split button on action and reset state
                     st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
                     st.rerun()
+                
                 elif res == "Reset":
                     reset_element_styles(element_key_base)
                     # Required to render new key for split button on action and reset state
@@ -500,3 +518,13 @@ with st.container(key="elements-main-container"):
                                 get_input_widget_for_property(prop, element_key, display_name)
 
                                 # Get the right display function and def
+
+            # Final bottom
+            if res == "Copy Python":
+                    
+                python_cmd = get_element_styles_to_python(element_name, element_key_base)
+
+                st_yled.code(python_cmd, background_color="#FFFFFF", language="python")
+
+                # Required to render new key for split button on action and reset state
+                st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
