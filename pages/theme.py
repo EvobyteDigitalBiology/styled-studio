@@ -9,6 +9,7 @@ import utils
 
 import uuid
 
+st_yled.init()
 
 def init_theme_session_state(key: str, default_value: str):
     """Initialize session state variables for theme settings with default values."""
@@ -35,7 +36,6 @@ def reset_defaults(keys: list[str]):
             del st.session_state[key_seed]
 
 def reset_seed(key: str):
-    
     del st.session_state[key]
 
 def frame_select_reset_bar(key: str, reset_keys: list[str]):
@@ -64,7 +64,8 @@ def frame_select_reset_bar(key: str, reset_keys: list[str]):
             on_click=reset_defaults,
             args= (reset_keys,),
             font_size='14px',
-            key=f"{key}-reset-button"
+            key=f"{key}-reset-button",
+            border_style='none',
         )
 
         return frame_type_select, preview_selector_prefix
@@ -89,12 +90,14 @@ def theme_color_picker(theme_property: str,
     code_color = 'grey' if color_is_default else None
 
     utils.base_color_picker(
-        key=theme_property,
+        key=session_state_key,
         label=label,
         label_font_size=label_font_size,
         label_field_width=label_field_width,
         color_state_value=color_state_value,
-        code_color=code_color)
+        code_color=code_color,
+        caption_width=100
+    )
 
 
 def theme_checkbox(theme_property: str,
@@ -335,8 +338,8 @@ init_theme_session_state('theme-sidebar-codeFont', uiconfig.SIDEBAR_CODE_FONT_DE
 init_theme_session_state('theme-sidebar-codeFontSize', uiconfig.SIDEBAR_CODE_FONT_SIZE_DEFAULT)
 init_theme_session_state('theme-sidebar-codeFontWeight', uiconfig.SIDEBAR_CODE_FONT_WEIGHT_DEFAULT)
 
-
 # region UI
+
 
 with st.container(key="theme-main-container"):
 
@@ -400,7 +403,7 @@ with st.container(key="theme-main-container"):
                     height=128,
                     width=112
                 ):
-                    st_yled.markdown("**Primary**", width='content', color='#FFFFFF')
+                    st_yled.markdown("**Primary**", width='content', color='#FFFFFF', key="primary-color-preview-text")
 
                 
                 with st.container(horizontal=True, horizontal_alignment="right"):
@@ -413,7 +416,7 @@ with st.container(key="theme-main-container"):
                         horizontal=True,
                         horizontal_alignment="right"
                     ):
-                        st_yled.markdown("**Secondary Background**", width='content')
+                        st_yled.markdown("**Secondary Background**", width='content', )
 
                 st_yled.markdown("Textcolor",
                                 font_size='26px',
@@ -425,7 +428,8 @@ with st.container(key="theme-main-container"):
         # TODO: Expander BG Color
         with st_yled.expander("More Color Options",
                             key="theme-color-ext-expander",
-                            border_width='0px'):
+                            border_width='0px',
+                            background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT):
             
             color_ext_cont = st.container(key="theme-color-ext-container")
 
@@ -500,7 +504,8 @@ with st.container(key="theme-main-container"):
 
         with st_yled.expander("More Font Options",
                             key="theme-font-ext-expander",
-                            border_width='0px'):
+                            border_width='0px',
+                            background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT):
 
             font_ext_cont = st.container(key="theme-font-ext-container")
             
