@@ -140,7 +140,7 @@ def render_export_theme(config_toml_template_path: str):
                 key="export-theme-streamlit-docs-link")
 
         if not theme_updates and not theme_sidebar_updates:
-            st_yled.info("**:material/notifications: No theme updates found - yet**\n\nUse the theme editor to make changes")
+            st_yled.info("**:material/notifications: No theme updates found - yet**\n\nUse the theme editor to make your first changes")
         
         else:
             with st_yled.expander("I already have a config.toml file",
@@ -291,7 +291,7 @@ def render_export_elements():
     # element name -> css property -> value
 
 
-@st.dialog(title="Export Theme", width="medium")
+@st.dialog(title="Export to your app", width="medium")
 def export_config_toml():
 
     url = st.context.url
@@ -321,7 +321,7 @@ def export_config_toml():
         render_export_elements()
 
 
-@st.dialog("Help", width="medium")
+@st.dialog("Getting help", width="medium")
 def render_help_dialog():
     
     st_yled.init()
@@ -335,10 +335,18 @@ def render_help_dialog():
 
         st.image("assets/logo_small.svg", width=40)
 
-        st_yled.markdown("Welcome to **st_yled studio** - your place for beautiful Streamlit apps")
+        st_yled.markdown("Welcome to st_yled studio - your place for beautiful Streamlit apps")
 
     st.markdown("""
-    On the **Theme** page you can test and configure your global theme, including primary color and font.
+    With st_yled studio you can easily configure the layout and adapt UI elements of your Streamlit app.
+    Use st_yled studio together with the [st_yled Python package](https://st-styled.evo-byte.com/) to apply custom UI styling in your own apps.
+    """)
+
+    st.write("")
+    st.write("")
+
+    st.markdown("""
+    On the Theme page you can test and configure your global theme, including primary color and font.
     """)
 
     with st_yled.expander("More on **Theme**",
@@ -349,16 +357,15 @@ def render_help_dialog():
         with st_yled.container(key="help-dialog-theme-expander-content", background_color="#f7f8fa"):
 
             st_yled.markdown("""
-            Streamlit comes with built in configuration options for different aspects of its layout.
-
-            This includes for instance primary and secondary colors, background or global font settings.
-            Those settings are configured with a `config.toml` file placed inside the `.streamlit` folder at your project root directory.
-
-            The `config.toml` file contains `[theme]` and `[theme.sidebar]` section where global theme settings can be configured.
-
+            Streamlit comes with built-in configuration options for different aspects of its layout. 
+            This includes primary and secondary colors, background or font settings.
+            
             Use the Theme editor to try out different configurations for your app. The preview pages will help you guide your optimal layout.
-
-            Once you are happy click *Export to your App* where you can copy or download your updated theme settings.
+            
+            Those settings are configured in your app with a `config.toml` file. This file is placed inside the `.streamlit` folder at your project root directory.
+            
+            Your can create and download the `config.toml` by clicking the *Export to your app* button.
+            The `config.toml` file contains `[theme]` and `[theme.sidebar]` section where global theme settings can be configured.
             """, 
             key="help-dialog-more-on-theme-markdown")
 
@@ -368,7 +375,7 @@ def render_help_dialog():
                 key="help-theme-streamlit-docs-link")
 
     st.markdown("""
-    On the **Elements** page you can customize many Streamlit components and widgets with your own unique colors, sizes and backgrounds.
+    On the Elements page you can customize many Streamlit components and widgets with your own unique colors, sizes and backgrounds.
     This gives your apps a distinct appeal and alignment with your brand.
     """)
 
@@ -380,30 +387,29 @@ def render_help_dialog():
         with st_yled.container(key="help-dialog-elements-expander-content", background_color="#f7f8fa"):
 
             st_yled.markdown("""
-            Customizing individual Streamlit Elements is super easy. Just add the element you want to customize to the editor pane and configure properties like color, text or border. 
-            The interactive preview displays the effect of those changes. 
+            Customizing Streamlit elements is super easy. Just add an element to the editor pane and configure properties like color, text or border. 
+            The interactive preview shows the effect of those changes. 
             
-            Once you are happy, you can click *Export to your app*. From here you can download the st-styled.css file which you should place in the .streamlit folder of your app,
+            Once you are happy, click *Export to your app*. From here you can download the `st-styled.css` file and place in the `.streamlit` folder of your app,
             or directly copy the css code.
             
             You can also copy Python code directly from the editor cards of each element.
 
-            :material/notifications: Styling individual element requires you to add the st-styled package as a dependency to your Streamlit Python project.
-            On each app page run `st_yled.init()` to load the configurations form the `st-styled.css`.
+            :material/notifications: Styling individual elements requires the `st-styled` package available in your Streamlit project.
+            On each of your app pages run `st_yled.init()` to load the configurations from the `st-styled.css`.
             """,
             key="help-dialog-more-on-elements-markdown")
 
             st_yled.markdown(
-                "More information in the [st_yled Python package](https://st-styled.evo-byte.com/)",
+                "More information in the [st-styled Python package](https://st-styled.evo-byte.com/)",
                 font_size="12px",
                 key="help-elements-styled-docs-link")
 
     st.markdown("""
-    Click **Export to your app** when you are happy with your styling. 
+    Click *Export to your app* when you are happy with your styling. 
     From here you can download or copy the theme or element styling to your Streamlit project.
     """)
 
-    st.write("")
     st.write("")
 
     if st.button("Close", type='secondary', width=90):
@@ -464,27 +470,35 @@ with st.sidebar.container(key="sidebar-footer-container"):
 
 # region HEADER
 
+sticky_header_bg = st_yled.container(
+    key="sticky-header-bg",
+    background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
+)
+
+with sticky_header_bg:
+    st.write("")
+
 sticky_header = st_yled.container(
     key="sticky-header",
     horizontal=True,
-    vertical_alignment="distribute",
+    vertical_alignment="center",
 )
 
 with sticky_header:
     
-    with st.container(horizontal=True, horizontal_alignment="left"):
+    with st.container(horizontal=True, horizontal_alignment="left", key="header-left-container", vertical_alignment="center"):
         
         #st.image("assets/st_yled Logo.png", width=40)
-        st_yled.title("st_yled studio", font_size='32px', key="header-title")
+        st_yled.title("st_yled studio", font_size='26px', key="header-title", color="#97A6C3")
 
-    with st.container(horizontal=True, horizontal_alignment="right"):
+    with st.container(horizontal=True, horizontal_alignment="right", vertical_alignment="center"):
 
-        st_yled.button("Export to your App", type='primary', icon=':material/file_export:', on_click=export_config_toml, key="export-button")
+        st_yled.button("Export to your app", type='primary', icon=':material/file_export:', on_click=export_config_toml, key="export-button")
         
         # Option for popover export
         # with st_yled.popover("Export Theme", icon=':material/file_export:', background_color=uiconfig.PRIMARY_COLOR_DEFAULT, width=172, color="#ffffff"):
         #     render_export_theme()
 
-        st_yled.button("Help", icon=':material/help:', key="help-button", on_click=render_help_dialog, border_style="none")
+        st_yled.button("Help", icon=':material/help:', key="help-button", type='tertiary', on_click=render_help_dialog, border_style="none")
 
 pg.run()

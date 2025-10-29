@@ -60,7 +60,17 @@ div[data-testid="stSidebarNavLinkContainer"] span {
     max-width: 704px;
     padding: 8px 0px;
     height: 56px;
-    background-color: white;
+    background-color: transparent;
+}
+
+.st-key-sticky-header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9998;
+    width: 100%;
+    height: 56px;
+    min-height: 56px;
 }
 
 .st-key-sticky-header h1 {
@@ -219,7 +229,6 @@ Theme Export */
 .st-key-export-theme-step-1-markdown code,
 .st-key-export-theme-step-2-markdown code,
 .st-key-export-theme-step-3-markdown code {
-    color: #31333f;
     font-size: 14px;
 }
 
@@ -328,12 +337,15 @@ Theme Export */
 }
 
 .st-key-help-dialog-theme-expander-content code,
-.st-key-help-dialog-elements-expander-content code {
+.st-key-help-dialog-elements-expander-content code,
+.st-key-export-elements-container code
+{
     font-size: 14px;
 }
 
 .st-key-help-theme-streamlit-docs-link p,
-.st-key-help-elements-styled-docs-link p {
+.st-key-help-elements-styled-docs-link p,
+.st-key-export-elements-docs-link p {
     font-weight: 500;
 }
 
@@ -346,4 +358,19 @@ Theme Export */
     font-weight: 500;
     margin-bottom: 8px;
     font-size: 12px;
+}
+
+.st-key-header-left-container div {
+    display: flex;
+    align-items: center;
+}
+
+.st-key-header-title {
+    height: 40px;
+    min-height: 40px;
+    align-items: center;
+}
+
+.st-key-header-title .stHeading {
+    margin-top: 4px;
 }
