@@ -127,12 +127,13 @@ def base_color_picker(key: str,
                         label_font_size: str,
                         label_field_width: int,
                         color_state_value: str,
-                        code_color: str
+                        code_color: str,
+                        caption_width: int
                         ):
 
     with st.container(horizontal=True, vertical_alignment="center"):
 
-        st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
+        st_yled.markdown(label, font_size=label_font_size, width=label_field_width, key=key + "-label")
 
         st_yled.code(
                 color_state_value,
@@ -140,6 +141,7 @@ def base_color_picker(key: str,
                 font_size='14px',
                 color=code_color,
                 width=124,
+                key=key + "-code"
             )
 
         if color_state_value.startswith('#') and len(color_state_value) == 9:
@@ -158,7 +160,7 @@ def base_color_picker(key: str,
             args=(key, key + "-picker"),
         )
 
-        st_yled.caption("Select Color", width=100)
+        st.caption("Select Color", width=caption_width)
 
 def base_size_input(key,
                     seed_value: str,
