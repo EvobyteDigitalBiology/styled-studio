@@ -11,11 +11,6 @@ import st_yled
 import uiconfig
 import utils
 
-import logging
-
-logging.basicConfig(level=logging.error)
-logger = logging.getLogger(__name__)
-
 st_yled.init()
 
 def add_element_to_selection(element_name: str):
@@ -64,14 +59,20 @@ def remove_element_from_selection(element_hash: str,
                                 element_key_base: str,
                                 element_name: str):
 
+    element_name_prefix = 'element-' + element_name
+
     # Remove from selection and available elements for selection
     del st.session_state['element-select'][element_hash]
     st.session_state['element-select-names'].remove(element_name)
 
     # Remove all associated session state keys
-    keys_to_remove = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value")]
+    keys_to_remove = [key for key in st.session_state.keys() if key.startswith(element_name_prefix) and key.endswith("-value")]
+    input_seed_keys_to_remove = [key for key in st.session_state.keys() if key.startswith(element_name_prefix) and key.endswith("-value-seed")]
 
     for key in keys_to_remove:
+        del st.session_state[key]
+
+    for key in input_seed_keys_to_remove:
         del st.session_state[key]
 
 
@@ -261,7 +262,6 @@ category_slug_display_map = utils.revert_category_slugs()
 # Get all display names for categories
 category_display_options = [category_slug_display_map[cat] for cat in category_options]
 
-
 # Add button as a default example for styling
 
 if st.session_state['element-first-open']:
@@ -275,7 +275,7 @@ with st.container(key="elements-main-container"):
     st.markdown("**> Elements** Style and customize individual Streamlit UI elements")
 
     with st_yled.popover('Style element',
-                        icon=":material/add_circle:",
+                        icon=":material/style:",
                         background_color="#ff4b4b",
                         color="#ffffff",
                         key="elements-add-element-popover"):
@@ -319,8 +319,9 @@ with st.container(key="elements-main-container"):
                 with st.container(key = "elements-add-element-selection-container"):
 
                     st_yled.button(
-                        "Add to selection",
+                        "Add to editor pane",
                         key="elements-add-element-selection",
+                        icon=":material/add_box:",
                         type="primary",
                         on_click=add_element_to_selection,
                         args=(element_select,)
@@ -468,13 +469,16 @@ with st.container(key="elements-main-container"):
                     # Required to render new key for split button on action and reset state
                     st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
                 elif res == "Remove":
-                    logger.info(f"Removing styles for element {element_name} with key base {element_key_base}")
+
+                    # Make sure to delete variants if any
                     remove_element_from_selection(element_hash,element_key_base,element_name)
+                    
+                    
+                    
                     # Required to render new key for split button on action and reset state
                     st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
                     st.rerun()
                 elif res == "Reset":
-                    logger.info(f"Resetting styles for element {element_name} with key base {element_key_base}")
                     reset_element_styles(element_key_base)
                     # Required to render new key for split button on action and reset state
                     st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())

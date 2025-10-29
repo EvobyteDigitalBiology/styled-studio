@@ -628,7 +628,7 @@ base = "light"
 # 
 # If this isn't set, the font size will be 16px.
 
-# baseFontSize = 12
+baseFontSize = 16
 
 # The root font weight for the app.
 # 
