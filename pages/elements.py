@@ -112,12 +112,12 @@ def reset_element_styles(element_key_base: str):
 #     st.toast("Element Python copied to clipboard", icon=":material/content_copy:")
 
 
-def get_element_styles_to_python(element_name: str, element_key_base: str):
+def get_element_styles_to_python(element_name: str, element_key_base: str, type_select: str = None) -> str:
     
     # Get values for all associated session state keys
     keys_to_copy = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value")]
 
-    # Extract properrties from keys
+    # Extract properties from keys
     all_args = []
     for key in keys_to_copy:
         key_parse = key.replace("-value", "").replace("element-", "")
@@ -127,10 +127,15 @@ def get_element_styles_to_python(element_name: str, element_key_base: str):
         all_args.append(arg_str)
     all_args_str = ", ".join(all_args)
 
-    if all_args_str:
-        python_cmd = f"st_yled.{element_name}(*, {all_args_str})"
+    if type_select:
+        type_args_str = f", type=\"{type_select}\""
     else:
-        python_cmd = f"st_yled.{element_name}(*)"
+        type_args_str = ""
+
+    if all_args_str:
+        python_cmd = f"st_yled.{element_name}(*{type_args_str}, {all_args_str})"
+    else:
+        python_cmd = f"st_yled.{element_name}(*{type_args_str})"
 
     return python_cmd
 
@@ -521,8 +526,13 @@ with st.container(key="elements-main-container"):
 
             # Final bottom
             if res == "Copy Python":
-                    
-                python_cmd = get_element_styles_to_python(element_name, element_key_base)
+                
+                if type_selector:
+                    type_select_arg = type_select
+                else:
+                    type_select_arg = None
+
+                python_cmd = get_element_styles_to_python(element_name, element_key_base, type_select_arg)
 
                 st_yled.code(python_cmd, background_color="#FFFFFF", language="python")
 
