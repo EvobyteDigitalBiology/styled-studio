@@ -6,7 +6,7 @@ authors = [
     {name = "JonathanAlles", email = "Jonathan.Alles@evo-byte.com"}
 ]
 readme = "readme.md"
-requires-python = ">=3.10"  # Changed from >=3.11 for broader compatibility
+requires-python = ">=3.11"
 license = {text = "MIT"}
 keywords = ["streamlit", "styling", "css", "components", "ui"]
 classifiers = [
@@ -26,7 +26,9 @@ dependencies = [
     "streamlit>=1.42.0",  # Add Streamlit peer dependency (minimum version 1.42)
     "pandas>=2.0.0,<3.0.0",
     "openpyxl>=3.1.5,<4.0.0",
-    "st-styled @ git+https://github.com/EvobyteDigitalBiology/st-styled@v0.0.4"
+    "st-styled @ file:///home/jona/scribble/st-styled/dist/st_styled-0.0.4-py3-none-any.whl",
+    "pyperclip (>=1.11.0,<2.0.0)",
+    "streamlit-split-button (>=0.1.0,<0.2.0)",
 ]
 
 [project.optional-dependencies]
