@@ -1,9 +1,15 @@
+import logging
+import re
+from urllib.parse import urlparse
 import streamlit as st
 import st_yled
 
 import uiconfig
-import re
-from urllib.parse import urlparse
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+
 
 def get_updated_theme_config():
     """Check in session state which theme values were updated compared to default
@@ -31,8 +37,12 @@ def get_updated_theme_config():
                     updated_config[key] = "true" if st.session_state[key] else "false"
                 elif isinstance(st.session_state[key], tuple):
                     size_value, size_unit = st.session_state[key]
+
+                    # Round float values to 2 decimal places
+                    if isinstance(size_value, float):
+                        size_value = round(size_value, 2)
+
                     updated_config[key] = f'\"{size_value}{size_unit}\"'
-                
                 elif isinstance(st.session_state[key], int):
                     updated_config[key] = f'{st.session_state[key]}'
                 else:
@@ -113,6 +123,7 @@ def format_css_from_dict(css_dict: dict) -> str:
         css_lines.append("}\n")
 
     return "\n".join(css_lines)
+
 
 
 def render_export_theme(config_toml_template_path: str):
@@ -209,9 +220,10 @@ def render_export_elements():
             css_prop_format = key_parse.split("-")[-1]
             element_name = "_".join(key_parse.split("-")[:-1])
 
-            if element_name not in export_elements:
-                export_elements[element_name] = {}
-            export_elements[element_name][css_prop_format] = st.session_state[key]
+            if element_name not in uiconfig.ELEMENTS_EXCLUDED_FROM_CSS:
+                if element_name not in export_elements:
+                    export_elements[element_name] = {}
+                export_elements[element_name][css_prop_format] = st.session_state[key]
 
     # Get CSS for element
     export_css = {}
@@ -290,6 +302,7 @@ def render_export_elements():
     # Required format
     # element name -> css property -> value
 
+# region Dialogs
 
 @st.dialog(title="Export to your app", width="medium")
 def export_config_toml():
@@ -427,6 +440,61 @@ def render_help_dialog():
 
 
 
+@st.dialog("Send your feedback", width="medium")
+def render_feedback_dialog():
+
+    st_yled.init()
+
+    # Which features, functions or components are missing? 
+    feedback_cont = st.container(key="feedback-dialog-container")
+
+    with st_yled.container(key="feedback-dialog-intro-container",
+                            horizontal=True,
+                            vertical_alignment="center",
+                            background_color="#F6F6F6",):
+
+        st.image("assets/logo_small.svg", width=40)
+
+        st_yled.markdown("""
+Which **features**, **styles** or **components** are missing?
+
+Send us your **feedback** and **ideas**!
+""")
+    
+    st.write("")
+
+    with st_yled.container(key="feedback-dialog-form-container"):
+
+        email = st_yled.text_input("Your email (optional)", width=512)
+
+        feedback = st_yled.text_area("Your feedback, ideas or suggestions", width=512)
+
+        st.write("")
+
+        bgroup_cont = st_yled.container(key="send-feedback-button-group-container", horizontal=True)
+
+        if bgroup_cont.button("Send", icon=':material/send:', type='primary'):
+            
+            if feedback.strip() == "":
+                st_yled.warning("Please provide feedback before sending", width=512)
+            else:
+
+                st.session_state["feedback-submitted"] = True
+                if email.strip() != "":
+                    logger.info("Feedback received from %s", email)
+                    print(f"Feedback received from {email}")
+
+                logger.info("Feedback received: %s", feedback)
+                print(f"Feedback received: {feedback}")
+            
+                st_yled.rerun()
+
+        if bgroup_cont.button("Cancel"):
+            st_yled.rerun()
+
+    st_yled.write("")
+    st_yled.write("")
+
 
 # region UI
 
@@ -442,6 +510,10 @@ st.set_page_config(page_title="st_yled studio",
 
 st.logo("assets/st_yled_logo_corer.svg", size="large")
 
+if "feedback-submitted" in st.session_state:
+    if st.session_state["feedback-submitted"]:
+        st.toast("Thank you for your feedback!", icon=":material/check_circle:", duration="long")
+        del st.session_state["feedback-submitted"]
 
 # region SIDEBAR FOOTER
 
@@ -468,6 +540,7 @@ with st.sidebar.container(key="sidebar-footer-container"):
                         key="sidebar-footer-logo-side",
                         width=80)
 
+
 # region HEADER
 
 sticky_header_bg = st_yled.container(
@@ -486,7 +559,7 @@ sticky_header = st_yled.container(
 
 with sticky_header:
     
-    with st.container(horizontal=True, horizontal_alignment="left", key="header-left-container", vertical_alignment="center"):
+    with st.container(horizontal=True, horizontal_alignment="left", key="header-left-container", vertical_alignment="center", width=250):
         
         #st.image("assets/st_yled Logo.png", width=40)
         st_yled.title("st_yled studio", font_size='26px', key="header-title", color="#97A6C3")
@@ -499,6 +572,9 @@ with sticky_header:
         # with st_yled.popover("Export Theme", icon=':material/file_export:', background_color=uiconfig.PRIMARY_COLOR_DEFAULT, width=172, color="#ffffff"):
         #     render_export_theme()
 
-        st_yled.button("Help", icon=':material/help:', key="help-button", type='tertiary', on_click=render_help_dialog, border_style="none")
+        st_yled.button("Help", icon=':material/help:', key="help-button", type='secondary', on_click=render_help_dialog, border_style="none", background_color="#97a6c326")
+
+        st_yled.button("Feedback", icon=':material/comment:', key="feedback-button", type='secondary', on_click=render_feedback_dialog, border_style="none", background_color="#97a6c326")
+
 
 pg.run()
