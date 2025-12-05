@@ -141,7 +141,6 @@ def get_element_styles_to_python(element_name: str, element_key_base: str, type_
 
 
 
-
 def elements_color_picker(elements_key: str,
                         label: str,
                         label_font_size: str = '20px',
@@ -154,8 +153,14 @@ def elements_color_picker(elements_key: str,
         color_state_value = "default"
         code_color = "grey"
 
+    input_seed_key = key + "-seed"
+
+    if not input_seed_key in st.session_state:
+        st.session_state[input_seed_key] = str(uuid.uuid4())
+
     utils.base_color_picker(
         key=elements_key,
+        seed_value=st.session_state[input_seed_key],
         label=label,
         label_font_size=label_font_size,
         label_field_width=label_field_width,
@@ -168,7 +173,8 @@ def elements_selectbox(key: str,
                         label: str,
                         options: list[str],
                         label_font_size: str = '16px',
-                        label_field_width: int = 130):
+                        label_field_width: int = 130,
+                        format_func = lambda x: x):
 
     input_seed_key = key + "-seed"
 
@@ -184,12 +190,14 @@ def elements_selectbox(key: str,
         selected_option = st_yled.selectbox(
             "Select an option",
             options=options,
+            format_func=format_func,
             index=None,
             key=key + "-selectbox-" + seed_value,
             label_visibility="collapsed",
             on_change=utils.update_st_from_input,
+            placeholder = "default",
             args=(key, key + "-selectbox-" + seed_value),
-            width = 180
+            width = 160
         )
 
         st_yled.caption("Select Option", width=80)
@@ -243,12 +251,24 @@ def elements_size_input(key,
     )
 
 
+def weight_display_func(option):
+
+    options = ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
+    display_options = ["thin", "extra-light", "light", "normal", "medium", "semi-bold", "bold", "extra-bold", "black"]
+
+    if option is None:
+        return None
+    else:
+        return display_options[options.index(option)]
+
+
 def get_input_widget_for_property(prop: str, key: str, display_name: str):
 
     widget_type = uiconfig.css_properties_input_widget[prop]
     
     if widget_type == 'color_picker':
         elements_color_picker(key, display_name, label_font_size='16px')
+    
     elif widget_type == 'size_input':
         allowed_units = ['px', 'em', 'rem']
         unit_step_sizes = [1.0, 0.1, 0.1]
@@ -259,10 +279,15 @@ def get_input_widget_for_property(prop: str, key: str, display_name: str):
             unit_step_sizes,
             label_font_size='16px'
         )
+    
     elif widget_type == 'selectbox':
         if prop == 'border_style':
             options = ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset', 'hidden']
             elements_selectbox(key, display_name, options, label_font_size='16px')
+        elif prop == 'font_weight':
+            options = ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
+
+            elements_selectbox(key, display_name, options, format_func=lambda x: weight_display_func(x), label_font_size='16px')
     else:
         pass
 
@@ -307,6 +332,7 @@ with st.container(key="elements-main-container"):
                         background_color="#ff4b4b",
                         color="#ffffff",
                         key="elements-add-element-popover"):
+
         cont = st.container(width=600)
 
         col1, col2 = cont.columns([4,3])
@@ -343,7 +369,6 @@ with st.container(key="elements-main-container"):
             if element_select:
 
                 # Top Button Controls for Adding Element Styles
-
                 with st.container(key = "elements-add-element-selection-container"):
 
                     st_yled.button(
@@ -370,6 +395,9 @@ with st.container(key="elements-main-container"):
 
     elements_display = st.session_state['element-select']
     display_keys = list(elements_display.keys())[::-1]  # Reverse order for display
+
+
+# region Render Cards
 
     for ix, element_hash in enumerate(display_keys):
 
@@ -505,6 +533,10 @@ with st.container(key="elements-main-container"):
                     reset_element_styles(element_key_base)
                     # Required to render new key for split button on action and reset state
                     st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
+
+                    # Delete all input seed keys associated with this element
+                    #input_seed_keys_to_remove = [key for key in st.session_state.keys() if key
+
                     st.rerun()
 
             with col2:
@@ -523,6 +555,7 @@ with st.container(key="elements-main-container"):
                                 get_input_widget_for_property(prop, element_key, display_name)
 
                                 # Get the right display function and def
+
 
             # Final bottom
             if res == "Copy Python":

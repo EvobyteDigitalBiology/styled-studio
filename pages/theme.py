@@ -23,8 +23,6 @@ def update_st_from_input(theme_property: str, input_selector_key: str):
 
 def reset_defaults(keys: list[str]):
 
-    #print(st.session_state)
-
     for key in keys:
         default_key = f"{key}-default"
         if default_key in st.session_state:
@@ -83,6 +81,12 @@ def theme_color_picker(theme_property: str,
     session_state_key = f"theme-{theme_property}"
     session_state_key_default = f"{session_state_key}-default"
 
+    # Create a unique seed for component
+    input_seed_key = f"theme-{theme_property}-seed"
+
+    if not input_seed_key in st.session_state:
+        st.session_state[input_seed_key] = str(uuid.uuid4())
+
     color_state_value = st.session_state[session_state_key]
 
     color_is_default = color_state_value == st.session_state[session_state_key_default] 
@@ -91,6 +95,7 @@ def theme_color_picker(theme_property: str,
 
     utils.base_color_picker(
         key=session_state_key,
+        seed_value=st.session_state[input_seed_key],
         label=label,
         label_font_size=label_font_size,
         label_field_width=label_field_width,
@@ -131,6 +136,8 @@ def theme_checkbox(theme_property: str,
         )
 
         st_yled.caption("Enable", width=100)
+
+
 
 
 def theme_size_input(theme_property: str,
@@ -178,11 +185,11 @@ def theme_size_input(theme_property: str,
 
 
 def theme_font_input(theme_property: str,
-                        label: str,
-                        label_font_size: str = '20px',
-                        label_field_width: int = 140,
-                        frame_type: Literal["main", "sidebar"] = "main",
-                        key: Optional[str] = None):
+                    label: str,
+                    label_font_size: str = '20px',
+                    label_field_width: int = 140,
+                    frame_type: Literal["main", "sidebar"] = "main",
+                    key: Optional[str] = None):
     
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
@@ -244,6 +251,18 @@ def theme_font_input(theme_property: str,
         st.session_state[session_state_key] = font_value
 
 
+
+def update_base_weight_from_input(theme_property: str,
+                                    input_selector_key: str):
+
+    # Reset if input selector is none
+    if st.session_state[input_selector_key] is None:
+        del st.session_state[theme_property]
+    else:
+        new_value = st.session_state[input_selector_key]
+        st.session_state[theme_property] = new_value
+
+
 def theme_weight_input(theme_property: str,
                         label: str,
                         label_font_size: str = '20px',
@@ -275,13 +294,12 @@ def theme_weight_input(theme_property: str,
             min_value=100,
             max_value=600,
             step=100,
-            key=theme_property + "-number-" + st.session_state[input_seed_key],
+            key=session_state_key + "-number-" + st.session_state[input_seed_key],
             label_visibility="collapsed",
             width=138,
+            on_change=update_base_weight_from_input,
+            args=(session_state_key, session_state_key + "-number-" + st.session_state[input_seed_key])
         )
-
-        st.session_state[session_state_key] = number_value
-
 
 
 # Initialize main theme session state
@@ -490,10 +508,44 @@ with st.container(key="theme-main-container"):
         font_cont = st.container(key="theme-font-container")
 
         with font_cont:
+            
+            with st_yled.container(key="theme-base-font-container", horizontal=True, gap='large'):
 
-            theme_font_input("font", "Base Font", frame_type=frame_type_select, key="theme-base-font-input")
+                with st_yled.container(key="theme-base-font-input-container", horizontal=True, horizontal_alignment="left"):
+                    theme_font_input("font", "Base Font", frame_type=frame_type_select, key="theme-base-font-input")
 
-            theme_font_input("headingFont", "Heading Font", frame_type=frame_type_select, key="theme-heading-font-input")
+                # Get preview font, size and weight
+                preview_font = st.session_state[f'{preview_selector_prefix}-font']
+
+                if frame_type_select == "main":
+                    preview_size = st.session_state[f'{preview_selector_prefix}-baseFontSize']
+                    preview_weight = st.session_state[f'{preview_selector_prefix}-baseFontWeight']
+                else:
+                    preview_size = 16
+                    preview_weight = 400
+
+                if preview_font != "'':":
+
+                    with st.container(key="theme-base-font-weight-input-container", horizontal_alignment="right", vertical_alignment="bottom"):
+                        
+                        st.html(f"<span style='font-family:{preview_font}; font-size:{preview_size}px; font-weight:{preview_weight};'>Base Font Preview</span>")
+                        st_yled.divider()
+
+            with st_yled.container(key="theme-heading-font-container", horizontal=True, gap='large'):
+
+                with st_yled.container(key="theme-heading-font-input-container", horizontal=True, horizontal_alignment="left"):
+                    theme_font_input("headingFont", "Heading Font", frame_type=frame_type_select, key="theme-heading-font-input")
+
+                heading_preview_font = st.session_state[f'{preview_selector_prefix}-headingFont']
+
+                if heading_preview_font != "'':":
+
+                    with st.container(key="theme-heading-font-weight-input-container", horizontal_alignment="right", vertical_alignment="bottom"):
+                        
+                        st.html(f"<span style='font-family:{heading_preview_font}; font-size:20px; font-weight:600;'>Heading Font Preview</span>")
+                        st_yled.divider()
+
+
 
             if frame_type_select == "main":
                 

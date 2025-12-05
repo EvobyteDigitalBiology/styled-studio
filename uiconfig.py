@@ -1,11 +1,10 @@
-
-
 CONFIG_TOML_TEMPLATE_PATH = "assets/template_config.toml"
 
 css_properties_display_name = {
     'background_color': 'Background Color',
     'color': 'Text Color',
     'font_size': 'Font Size',
+    'font_weight': 'Font Weight',
     'border_style': 'Border Style',
     'border_color': 'Border Color',
     'border_width': 'Border Width',
@@ -15,6 +14,7 @@ css_properties_tabs = {
     'background_color': 'Color',
     'color': 'Color',
     'font_size': 'Font',
+    'font_weight': 'Font',
     'border_style': 'Border',
     'border_color': 'Border',
     'border_width': 'Border',
@@ -30,10 +30,16 @@ css_properties_input_widget = {
     'background_color': 'color_picker',
     'color': 'color_picker',
     'font_size': 'size_input',
+    'font_weight': 'selectbox',
     'border_style': 'selectbox',
     'border_color': 'color_picker',
     'border_width': 'size_input',
 }
+
+
+# Elements not exported to CSS
+ELEMENTS_EXCLUDED_FROM_CSS = ['container']
+
 
 # theme default values - COLOR
 PRIMARY_COLOR_DEFAULT = "#ff4b4b"
