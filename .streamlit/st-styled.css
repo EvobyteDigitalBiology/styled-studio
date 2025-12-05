@@ -326,7 +326,9 @@ Theme Export */
     text-align: center;
 }
 
-.st-key-help-dialog-intro-container {
+.st-key-help-dialog-intro-container,
+.st-key-feedback-dialog-intro-container
+ {
     padding: 16px;
     margin-bottom: 24px;
 }
@@ -373,4 +375,25 @@ Theme Export */
 
 .st-key-header-title .stHeading {
     margin-top: 4px;
+}
+
+.st-key-help-button .stButton:has(button[kind="secondary"]) > button:hover,
+.st-key-feedback-button .stButton:has(button[kind="secondary"]) > button:hover
+{
+    background-color: #97a6c340 !important;
+}
+
+.st-key-feedback-dialog-form-container {
+    margin-left: 72px;
+}
+
+.st-key-theme-base-font-weight-input-container,
+.st-key-theme-heading-font-weight-input-container {
+    gap: 0px !important;
+    align-items: center;
+}
+
+.st-key-theme-base-font-weight-input-container hr,
+.st-key-theme-heading-font-weight-input-container hr {
+    margin: 0px;
 }
