@@ -123,13 +123,14 @@ def update_st_size_unit_from_input(theme_property: str,
             st.session_state[theme_property] = int(current_number)
 
 def base_color_picker(key: str,
-                        label: str,
-                        label_font_size: str,
-                        label_field_width: int,
-                        color_state_value: str,
-                        code_color: str,
-                        caption_width: int
-                        ):
+                    seed_value: str,
+                    label: str,
+                    label_font_size: str,
+                    label_field_width: int,
+                    color_state_value: str,
+                    code_color: str,
+                    caption_width: int
+                    ):
 
     with st.container(horizontal=True, vertical_alignment="center"):
 
@@ -154,10 +155,10 @@ def base_color_picker(key: str,
         color_picker = st.color_picker(
             f"Pick {label}",
             value=display_color,
-            key=key + "-picker",
+            key=key + "-picker-" + seed_value,
             label_visibility = "collapsed",
             on_change=update_st_from_input,
-            args=(key, key + "-picker"),
+            args=(key, key + "-picker-" + seed_value),
         )
 
         st.caption("Select Color", width=caption_width)
@@ -186,6 +187,7 @@ def base_size_input(key,
             key=key + "-number-" + seed_value,
             label_visibility="collapsed",
             on_change=update_st_size_value_from_input,
+            placeholder = "default",
             args=(key, key + "-number-" + seed_value, unit, return_value_type)
         )
 
