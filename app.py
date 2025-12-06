@@ -1,14 +1,31 @@
 import logging
+import os
 import re
 from urllib.parse import urlparse
 import streamlit as st
+import boto3
 import st_yled
+import dotenv
 
 import uiconfig
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+dotenv.load_dotenv()
+
+try:
+    ses_client = boto3.client('ses', region_name=os.getenv("AWS_REGION"), 
+                              aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+                              aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"))
+
+    feedback_email = os.getenv("FEEDBACK_MAIL")
+    if not feedback_email:
+        raise ValueError("FEEDBACK_MAIL not set in environment variables")
+
+except Exception as e:
+    logger.error(f"Failed to create SES client: {e}")
+    ses_client = None
 
 
 def get_updated_theme_config():
@@ -484,6 +501,23 @@ Send us your **feedback** and **ideas**!
                     logger.info("Feedback received from %s", email)
                     print(f"Feedback received from {email}")
 
+                if ses_client:
+
+                    email_message = f"Feedback:\n{feedback}\n\n"
+                    if email.strip() != "":
+                        email_message += f"From: {email}\n"
+
+                    ses_client.send_email(
+                        **{
+                            "Source": feedback_email,
+                            "Destination": {'ToAddresses': [feedback_email]},
+                            "Message": {
+                                "Subject": {"Data": "st_yled studio Feedback"},
+                                "Body": {"Text": {"Data": email_message}},
+                            },
+                        }
+                    )
+                
                 logger.info("Feedback received: %s", feedback)
                 print(f"Feedback received: {feedback}")
             
