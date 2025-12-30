@@ -325,7 +325,7 @@ if st.session_state['element-first-open']:
 
 with st.container(key="elements-main-container"):
 
-    st.markdown("**> Elements** Style and customize individual Streamlit UI elements")
+    st.markdown("**> Elements** Style and customize your Streamlit UI elements")
 
     with st_yled.popover('Style element',
                         icon=":material/style:",
