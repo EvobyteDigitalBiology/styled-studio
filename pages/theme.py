@@ -524,7 +524,8 @@ with st.container(key="theme-main-container"):
                     preview_size = 16
                     preview_weight = 400
 
-                if preview_font != "'':":
+                # Show Preview, only if one of default fonts(sans-serif, serif, monospace) is selected. Skip for Google Fonts.
+                if preview_font in ['sans-serif', 'serif', 'monospace']:
 
                     with st.container(key="theme-base-font-weight-input-container", horizontal_alignment="right", vertical_alignment="bottom"):
                         
@@ -538,7 +539,8 @@ with st.container(key="theme-main-container"):
 
                 heading_preview_font = st.session_state[f'{preview_selector_prefix}-headingFont']
 
-                if heading_preview_font != "'':":
+                # Show Preview, only if one of default fonts(sans-serif, serif, monospace) is selected. Skip for Google Fonts.
+                if heading_preview_font in ['sans-serif', 'serif', 'monospace']:
 
                     with st.container(key="theme-heading-font-weight-input-container", horizontal_alignment="right", vertical_alignment="bottom"):
                         
