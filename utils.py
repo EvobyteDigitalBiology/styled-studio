@@ -19,6 +19,7 @@ CATEGORY_SLUGS = {
     "Execution": "execution",
     "Navigation": "navigation",
     "Configuration": "configuration",
+    "Button": "button",
 }
 
 def revert_category_slugs():
@@ -176,7 +177,7 @@ def base_size_input(key,
 
     with st.container(horizontal=True, vertical_alignment="center", width=400):
 
-        st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
+        st_yled.markdown(label, font_size=label_font_size, width=label_field_width, key=key + "-label")
 
         # Number input // Operate on float
         number_value = st.number_input(
