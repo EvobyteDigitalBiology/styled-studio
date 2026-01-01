@@ -156,7 +156,7 @@ def render_export_theme(config_toml_template_path: str):
     
     with cont:
         
-        with st_yled.container(key="export-theme-info-box", background_color='#F6F6F6'):
+        with st_yled.container(key="export-theme-info-box", background_color='#F6F6F6', padding="16px"):
 
             st_yled.markdown("1. Make sure your project has a `.streamlit` directory", key="export-theme-step-1-markdown")
             st_yled.markdown("2. Download and place the `config.toml` file inside the `.streamlit` directory", key="export-theme-step-2-markdown")
@@ -272,7 +272,7 @@ def render_export_elements():
     
     with cont:
 
-        with st_yled.container(key="export-elements-info-box", background_color='#F6F6F6'):
+        with st_yled.container(key="export-elements-info-box", background_color='#F6F6F6', padding="16px"):
 
             st_yled.markdown("1. Make sure your project has a `.streamlit` directory", key="export-elements-step-1-markdown")
             
@@ -355,7 +355,8 @@ def render_help_dialog():
     with st_yled.container(key="help-dialog-intro-container",
                             horizontal=True,
                             vertical_alignment="center",
-                            background_color="#F6F6F6",):
+                            background_color="#F6F6F6",
+                            padding='16px'):
 
         st.image("assets/logo_small.svg", width=40)
 
@@ -469,7 +470,8 @@ def render_feedback_dialog():
     with st_yled.container(key="feedback-dialog-intro-container",
                             horizontal=True,
                             vertical_alignment="center",
-                            background_color="#F6F6F6",):
+                            background_color="#F6F6F6",
+                            padding='16px'):
 
         st.image("assets/logo_small.svg", width=40)
 
