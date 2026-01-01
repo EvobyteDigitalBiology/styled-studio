@@ -102,8 +102,6 @@ div[data-testid="stSidebarNavLinkContainer"] span {
 
 .st-key-color-preview {
     gap: 8px !important;
-    padding: 16px;
-    padding-bottom: 64px;
     border-radius: 2px;
 }
 
@@ -111,7 +109,6 @@ div[data-testid="stSidebarNavLinkContainer"] span {
     margin-top: 16px;
     border: none;
     z-index: 1000; 
-    padding: 8px;
 }
 
 .st-key-secondary-color-preview {
@@ -120,7 +117,6 @@ div[data-testid="stSidebarNavLinkContainer"] span {
     top: -50px;
     flex-flow: row;
     align-items: end;
-    padding: 8px;
 }
 
 .st-key-secondary-color-preview p {
@@ -147,7 +143,6 @@ div[data-testid="stSidebarNavLinkContainer"] span {
 
 .st-key-border-preview {
     gap: 32px !important;
-    padding: 16px;
 }
 
 .st-key-theme-color-ext-expander,
@@ -176,19 +171,16 @@ div[data-testid="stSidebarNavLinkContainer"] span {
 }
 
 .st-key-color-ext-preview {
-    padding: 16px 16px;
     margin-top: 16px;
     gap: 48px !important;
     border-radius: 2px;
 }
 
 .st-key-color-ext-selectors {
-    padding: 16px 16px;
     gap: 48px !important;
 }
 
 .st-key-bordercolor-preview {
-    padding: 8px;
     height: 64px;
 }
 
@@ -205,7 +197,6 @@ div[data-testid="stSidebarNavLinkContainer"] span {
 
 .st-key-dataframe-border-color-preview {
     min-height: 156px;
-    padding: 8px;
     border-top: none !important;
     z-index: 1000;
     background-color: transparent;
@@ -213,10 +204,6 @@ div[data-testid="stSidebarNavLinkContainer"] span {
 }
 
 
-div[data-testid="stExpanderDetails"] {
-    padding: 0px;
-    border: none;
-}
 /* 
 Theme Export */
 
@@ -230,10 +217,6 @@ Theme Export */
 .st-key-export-theme-step-2-markdown code,
 .st-key-export-theme-step-3-markdown code {
     font-size: 14px;
-}
-
-.st-key-export-theme-updated-theme-container {
-    padding: 16px;
 }
 
 
@@ -258,11 +241,6 @@ Theme Export */
 .st-key-export-theme-container,
 .st-key-export-elements-container {
     gap: 40px;
-}
-
-.st-key-export-theme-info-box,
-.st-key-export-elements-info-box {
-    padding: 16px;
 }
 
 .st-key-elements-category-select label[data-baseweb="radio"] > div:first-child,
@@ -312,7 +290,6 @@ Theme Export */
 }
 
 .st-key-elements-add-element-preview-container {
-    padding: 16px;
     gap: 40px !important;
 }
 
@@ -329,13 +306,7 @@ Theme Export */
 .st-key-help-dialog-intro-container,
 .st-key-feedback-dialog-intro-container
  {
-    padding: 16px;
     margin-bottom: 24px;
-}
-
-.st-key-help-dialog-theme-expander-content,
-.st-key-help-dialog-elements-expander-content {
-    padding: 16px;
 }
 
 .st-key-help-dialog-theme-expander-content code,
