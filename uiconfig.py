@@ -8,6 +8,17 @@ css_properties_display_name = {
     'border_style': 'Border Style',
     'border_color': 'Border Color',
     'border_width': 'Border Width',
+    'padding': 'All-sides',
+    'padding_top': 'Top',
+    'padding_right': 'Right',
+    'padding_bottom': 'Bottom',
+    'padding_left': 'Left',
+    'label_color': 'Label Color',
+    'label_font_size': 'Label Font Size',
+    'label_font_weight': 'Label Font Weight',
+    'value_color': 'Value Color',
+    'value_font_size': 'Value Font Size',
+    'value_font_weight': 'Value Font Weight',
 }
 
 css_properties_tabs = {
@@ -18,6 +29,17 @@ css_properties_tabs = {
     'border_style': 'Border',
     'border_color': 'Border',
     'border_width': 'Border',
+    'padding': 'Padding',
+    'padding_top': 'Padding',
+    'padding_right': 'Padding',
+    'padding_bottom': 'Padding',
+    'padding_left': 'Padding',
+    'label_color': 'Label',
+    'label_font_size': 'Label',
+    'label_font_weight': 'Label',
+    'value_color': 'Value',
+    'value_font_size': 'Value',
+    'value_font_weight': 'Value',
 }
 
 element_type_format = {
@@ -34,6 +56,17 @@ css_properties_input_widget = {
     'border_style': 'selectbox',
     'border_color': 'color_picker',
     'border_width': 'size_input',
+    'padding': 'size_input',
+    'padding_top': 'size_input',
+    'padding_right': 'size_input',
+    'padding_bottom': 'size_input',
+    'padding_left': 'size_input',
+    'label_color': 'color_picker',
+    'label_font_size': 'size_input',
+    'label_font_weight': 'selectbox',
+    'value_color': 'color_picker',
+    'value_font_size': 'size_input',
+    'value_font_weight': 'selectbox',
 }
 
 
