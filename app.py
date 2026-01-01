@@ -172,42 +172,35 @@ def render_export_theme(config_toml_template_path: str):
         
         else:
             with st_yled.expander("I already have a config.toml file",
-                                    border_width=0,
                                     background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
-                                    key="export-theme-existing-config-expander"):
+                                    key="export-theme-existing-config-expander",
+                                    border_style="none"):
+            
+                st.write("")
+                st.markdown("Copy and add/replace sections in your `config.toml` file")
                 
-                with st.container(key="export-theme-updated-theme-container"):
+                main_theme_code = format_theme_toml(theme_updates, "theme")
+                sidebar_theme_code = format_theme_toml(theme_sidebar_updates, "theme.sidebar")
 
+                if theme_updates and theme_sidebar_updates:
+                    theme_tab, sidebar_tab = st_yled.tabs(["[theme]", "[theme.sidebar]"], key="export-theme-updated-theme-tabs")
 
-                    st.write("")
-                    st.markdown("Copy and add/replace sections in your `config.toml` file")
-                    
-                    main_theme_code = format_theme_toml(theme_updates, "theme")
-                    sidebar_theme_code = format_theme_toml(theme_sidebar_updates, "theme.sidebar")
+                    with theme_tab:
+                        st.code(main_theme_code)
+                    with sidebar_tab:
+                        st.code(sidebar_theme_code)
 
-                    if theme_updates and theme_sidebar_updates:
-                        theme_tab, sidebar_tab = st_yled.tabs(["[theme]", "[theme.sidebar]"], key="export-theme-updated-theme-tabs")
+                elif theme_updates:
+                    theme_tab = st_yled.tabs(["[theme]"], key="export-theme-updated-theme-tabs")
+                    with theme_tab[0]:
+                        st.code(main_theme_code)
 
-                        with theme_tab:
-                            st.write("")
-                            st.code(main_theme_code)
-                        with sidebar_tab:
-                            st.write("")
-                            st.code(sidebar_theme_code)
-
-                    elif theme_updates:
-                        theme_tab = st_yled.tabs(["[theme]"], key="export-theme-updated-theme-tabs")
-                        with theme_tab[0]:
-                            st.write("")
-                            st.code(main_theme_code)
-
-                    else:
-                        sidebar_tab = st_yled.tabs(["[theme.sidebar]"], key="export-theme-updated-theme-tabs")
-                        with sidebar_tab[0]:
-                            st.write("")
-                            st.code(sidebar_theme_code)
-                    
-                    st.write("")
+                else:
+                    sidebar_tab = st_yled.tabs(["[theme.sidebar]"], key="export-theme-updated-theme-tabs")
+                    with sidebar_tab[0]:
+                        st.code(sidebar_theme_code)
+                
+                st.write("")
 
         bgroup_cont = st.container(key="export-theme-button-group-container", horizontal=True)
 
@@ -294,13 +287,14 @@ def render_export_elements():
                     
         if not export_css_format:
 
-            st_yled.info("**:material/notifications: No element updates found - yet**\n\nUse the element editor to create first styling")
+            st_yled.info("**:material/notifications: No element updates found - yet**\n\nUse the element editor to create first styling", key="export-elements-no-updates-info")
 
         else:
 
             with st_yled.expander("I already have a st-styled.css file",
-                                    border_width=0,
-                                    background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT):
+                                    border_style='none',
+                                    background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
+                                    key="export-elements-existing-css-expander"):
 
                 st.write("")
                 st.markdown("Copy and add/replace sections in your `st-styled.css` file")
@@ -365,7 +359,7 @@ def render_help_dialog():
 
         st.image("assets/logo_small.svg", width=40)
 
-        st_yled.markdown("Welcome to st_yled studio - your place for beautiful Streamlit apps")
+        st_yled.markdown("Welcome to st_yled studio - your place for beautiful Streamlit apps", key="help-dialog-welcome-markdown")
 
     st.markdown("""
     With st_yled studio you can easily configure the layout and adapt UI elements of your Streamlit app.
@@ -382,9 +376,12 @@ def render_help_dialog():
     with st_yled.expander("More on **Theme**",
                             border_width=0,
                             background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
-                            key="help-dialog-theme-expander"):
+                            key="help-dialog-theme-expander",
+                            padding="0px"):
 
-        with st_yled.container(key="help-dialog-theme-expander-content", background_color="#f7f8fa"):
+        with st_yled.container(key="help-dialog-theme-expander-content",
+                               background_color="#f7f8fa",
+                               padding="16px"):
 
             st_yled.markdown("""
             Streamlit comes with built-in configuration options for different aspects of its layout. 
@@ -412,9 +409,12 @@ def render_help_dialog():
     with st_yled.expander("More on **Elements**",
                             border_width=0,
                             background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
-                            key="help-dialog-elements-expander"):
+                            key="help-dialog-elements-expander",
+                            padding="0px"):
 
-        with st_yled.container(key="help-dialog-elements-expander-content", background_color="#f7f8fa"):
+        with st_yled.container(key="help-dialog-elements-expander-content",
+                               background_color="#f7f8fa",
+                               padding="16px"):
 
             st_yled.markdown("""
             Customizing Streamlit elements is super easy. Just add an element to the editor pane and configure properties like color, text or border. 
@@ -453,7 +453,8 @@ def render_help_dialog():
     st_yled.markdown("""
     Join the [Github discussion](https://github.com/EvobyteDigitalBiology/st-styled/discussions) or email info@evo-byte.com
     """,
-    font_size="12px",)
+    font_size="12px",
+    key="help-dialog-contact-link-markdown")
 
 
 
@@ -476,24 +477,25 @@ def render_feedback_dialog():
 Which **features**, **styles** or **components** are missing?
 
 Send us your **feedback** and **ideas**!
-""")
+""",
+key="feedback-dialog-intro-markdown")
     
     st.write("")
 
     with st_yled.container(key="feedback-dialog-form-container"):
 
-        email = st_yled.text_input("Your email (optional)", width=512)
+        email = st_yled.text_input("Your email (optional)", width=512, key="feedback-email-input")
 
-        feedback = st_yled.text_area("Your feedback, ideas or suggestions", width=512)
+        feedback = st_yled.text_area("Your feedback, ideas or suggestions", width=512, key="feedback-text-area")
 
         st.write("")
 
         bgroup_cont = st_yled.container(key="send-feedback-button-group-container", horizontal=True)
 
-        if bgroup_cont.button("Send", icon=':material/send:', type='primary'):
+        if bgroup_cont.button("Send", icon=':material/send:', type='primary', key="send-feedback-button"):
             
             if feedback.strip() == "":
-                st_yled.warning("Please provide feedback before sending", width=512)
+                st_yled.warning("Please provide feedback before sending", width=512, key="feedback-empty-warning")
             else:
 
                 st.session_state["feedback-submitted"] = True
@@ -526,8 +528,8 @@ Send us your **feedback** and **ideas**!
         if bgroup_cont.button("Cancel"):
             st_yled.rerun()
 
-    st_yled.write("")
-    st_yled.write("")
+    st.write("")
+    st.write("")
 
 
 # region UI
@@ -555,12 +557,11 @@ with st.sidebar.container(key="sidebar-footer-container"):
     
     st_yled.markdown("Getting started with your app", font_size="12px", color='#31333F99', key="sidebar-footer-getting-started-markdown")
 
-    st_yled.markdown("[st_yled Python Package](https://st-styled.evo-byte.com/)", font_size="14px")
+    st_yled.markdown("[st_yled Python Package](https://st-styled.evo-byte.com/)", font_size="14px", key="sidebar-footer-styled-pkg-link-markdown")
     
     st_yled.markdown("For help and support", font_size="12px", color='#31333F99', key="sidebar-footer-help-markdown")
 
-    st_yled.markdown("[st_yled Community](https://github.com/EvobyteDigitalBiology/st-styled/discussions)", font_size="14px")
-
+    st_yled.markdown("[st_yled Community](https://github.com/EvobyteDigitalBiology/st-styled/discussions)", font_size="14px", key="sidebar-footer-community-link-markdown")
     st.write("")
 
     with st.container(key="sidebar-footer-letter-container", horizontal=True, vertical_alignment="center",
