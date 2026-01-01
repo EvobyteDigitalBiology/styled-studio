@@ -120,8 +120,8 @@ def get_element_styles_to_python(element_name: str, element_key_base: str, type_
     # Extract properties from keys
     all_args = []
     for key in keys_to_copy:
-        key_parse = key.replace("-value", "").replace("element-", "")
-        css_prop_format = key_parse.split("-")[-1]
+        assert key.endswith("-value") and key.startswith("element-")
+        css_prop_format = key.split("-")[-2]
         value = st.session_state[key]
         arg_str = f"{css_prop_format}=\"{value}\""
         all_args.append(arg_str)
@@ -284,7 +284,7 @@ def get_input_widget_for_property(prop: str, key: str, display_name: str):
         if prop == 'border_style':
             options = ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset', 'hidden']
             elements_selectbox(key, display_name, options, label_font_size='16px')
-        elif prop == 'font_weight':
+        elif prop.endswith('font_weight'):
             options = ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
 
             elements_selectbox(key, display_name, options, format_func=lambda x: weight_display_func(x), label_font_size='16px')
@@ -321,12 +321,14 @@ if st.session_state['element-first-open']:
     add_element_to_selection("button")
     st.session_state['element-first-open'] = False
 
+
 # region UI
 
 with st.container(key="elements-main-container"):
 
     st.markdown("**> Elements** Style and customize your Streamlit UI elements")
 
+    # Window to add new element styles
     with st_yled.popover('Style element',
                         icon=":material/style:",
                         background_color="#ff4b4b",
@@ -349,6 +351,7 @@ with st.container(key="elements-main-container"):
                     key="elements-category-select",
                 )
 
+            # Get all elements belonging to a category
             category_select = category_display_slug_map[category_select_display]
             cat_elements = element_categories[category_select]
 
@@ -380,12 +383,15 @@ with st.container(key="elements-main-container"):
                         args=(element_select,)
                     )
 
-                    with st_yled.container(key = "elements-add-element-preview-container", background_color="#F6F6F6"):
+                    with st_yled.container(key = "elements-add-element-preview-container",
+                                           background_color="#F6F6F6",
+                                           padding="16px"):
 
                         st_yled.subheader(element_select, font_size=24)
 
                         element_config = st_yled.styler.get_element_style(element_select)
 
+                        # Preview example if example code is available
                         if 'example' in element_config:
                             kwargs = {'key': f'preview-example-{element_select}'}
                             eval(element_config['example'])
@@ -393,6 +399,7 @@ with st.container(key="elements-main-container"):
                             st_yled.info("No preview available", icon=":material/info:")
 
 
+    # Get all selected elements to render as cards in main UI
     elements_display = st.session_state['element-select']
     display_keys = list(elements_display.keys())[::-1]  # Reverse order for display
 
@@ -401,6 +408,7 @@ with st.container(key="elements-main-container"):
 
     for ix, element_hash in enumerate(display_keys):
 
+        # Extract features like element name and types (e.g., primary, secondary)
         element_card_props = elements_display[element_hash]
         element_types = list(element_card_props['types'].keys())
         element_name = element_card_props['name']
@@ -409,7 +417,8 @@ with st.container(key="elements-main-container"):
         if 'element-card-split-' + element_hash not in st.session_state:
             st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
         
-        # Check if multiple types
+        # Check if multiple types like primary, secondary are defined for this element
+        # Source is in the element_card_props
         if len(element_types) == 1:
             type_selector = False
             type_select = element_types[0]
@@ -421,6 +430,7 @@ with st.container(key="elements-main-container"):
                 type_select = element_types[0]
 
         # Get available css properties for this element type
+        # Each css property is associated with a tab
         css_props = list(element_card_props['types'][type_select]['css'].keys())
         css_tabs = {uiconfig.css_properties_tabs[prop] for prop in css_props}
 
@@ -431,7 +441,14 @@ with st.container(key="elements-main-container"):
             tabs_render.append('Font')
         if 'Border' in css_tabs:
             tabs_render.append('Border')
+        if 'Padding' in css_tabs:
+            tabs_render.append('Padding')
+        if 'Label' in css_tabs:
+            tabs_render.append('Label')
+        if 'Value' in css_tabs:
+            tabs_render.append('Value')
 
+        # Create element card
         with st_yled.container(background_color='#F6F6F6',
                                 key=f"element-card-container-{element_hash}"):
             
@@ -478,6 +495,9 @@ with st.container(key="elements-main-container"):
                 
                 st_yled.subheader(element_name, font_size=24)
 
+                # type_select is defined in the beginning of the card
+                # type_select
+
                 # Check if multiple types
                 if type_selector:
                     type_select = st_yled.selectbox(
@@ -493,6 +513,7 @@ with st.container(key="elements-main-container"):
                 else:
                     st.write("")
 
+                # Define a name base for the element keys
                 element_key_base = 'element-' + element_name
                 if type_selector:
                     element_key_base = element_key_base + "-" + type_select
@@ -504,14 +525,24 @@ with st.container(key="elements-main-container"):
                     
                     kwargs = {}
                     # Extract all css properties for this element type
+                    # Get the values from session state if defined to be rendered in example page
                     for key in st.session_state.keys():
                         if key.startswith(element_key_base) and key.endswith("-value"):
-                            css_prop = key.replace(element_key_base + '-', "").replace('-value', "")
+                            css_prop = key.split("-")[-2]
                             css_value = st.session_state[key]
                             kwargs[css_prop] = css_value
                     
+                    # Add cases where example should be defined custom, like for containers
+                    if element_name == "container":
+                        with st_yled.container(**kwargs):
+                            st.write("Container Content")
+                    
+                    elif element_name == "expander":
+                        with st_yled.expander("Expander Title", **kwargs, expanded=True):
+                            st.write("Expander Content")
+
                     # Create example to displa changes
-                    if 'example' in element_card_props['types'][type_select]:
+                    elif 'example' in element_card_props['types'][type_select]:
                         eval(element_card_props['types'][type_select]['example'])
 
                 res = split_button(
@@ -521,7 +552,6 @@ with st.container(key="elements-main-container"):
                 )
             
                 if res == "Remove":
-
                     # Make sure to delete variants if any
                     remove_element_from_selection(element_hash,element_key_base,element_name)
                     
