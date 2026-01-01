@@ -406,7 +406,9 @@ with st.container(key="theme-main-container"):
             with st_yled.container(
                 key="color-preview",
                 background_color=st.session_state[f'{preview_selector_prefix}-backgroundColor'],
-                border = False
+                border = False,
+                padding='16px',
+                padding_bottom='64px'
             ):
                 bg_test = st.container(
                     horizontal=True,
@@ -419,7 +421,8 @@ with st.container(key="theme-main-container"):
                     key="primary-color-preview",
                     background_color=st.session_state[f'{preview_selector_prefix}-primaryColor'],
                     height=128,
-                    width=112
+                    width=112,
+                    padding='8px'
                 ):
                     st_yled.markdown("**Primary**", width='content', color='#FFFFFF', key="primary-color-preview-text")
 
@@ -432,7 +435,8 @@ with st.container(key="theme-main-container"):
                         height=112,
                         width=112,
                         horizontal=True,
-                        horizontal_alignment="right"
+                        horizontal_alignment="right",
+                        padding='8px'
                     ):
                         st_yled.markdown("**Secondary Background**", width='content', )
 
@@ -446,29 +450,32 @@ with st.container(key="theme-main-container"):
         # TODO: Expander BG Color
         with st_yled.expander("More Color Options",
                             key="theme-color-ext-expander",
-                            border_width='0px',
+                            border_style='none',
+                            padding='0px',
                             background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT):
             
             color_ext_cont = st.container(key="theme-color-ext-container")
 
             col1, col2 = color_ext_cont.columns([2,1])
 
-            with col1.container(key="color-ext-selectors"):
+            with col1:
+                with st_yled.container(key="color-ext-selectors", padding='16px'):
 
-                theme_color_picker("linkColor", "Link", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
+                    theme_color_picker("linkColor", "Link", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
 
-                theme_color_picker("codeBackgroundColor", "Code Background", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
+                    theme_color_picker("codeBackgroundColor", "Code Background", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
 
-                theme_color_picker("dataframeHeaderBackgroundColor", "DataFrame Header", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
+                    theme_color_picker("dataframeHeaderBackgroundColor", "DataFrame Header", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
 
-                theme_color_picker("dataframeBorderColor", "DataFrame Border", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
+                    theme_color_picker("dataframeBorderColor", "DataFrame Border", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
 
             with col2:
 
                 with st_yled.container(
                     key="color-ext-preview",
                     background_color=st.session_state[f'{preview_selector_prefix}-backgroundColor'],
-                    border = False
+                    border = False,
+                    padding='16px'
                 ):
 
                     st_yled.markdown("[Link Color](https://www.google.com)",
@@ -481,7 +488,8 @@ with st.container(key="theme-main-container"):
                     with st_yled.container(key="dataframe-border-color-preview",
                                             border_width='3px',
                                             border_style='solid',
-                                            border_color=st.session_state[f'{preview_selector_prefix}-dataframeBorderColor'],):
+                                            border_color=st.session_state[f'{preview_selector_prefix}-dataframeBorderColor'],
+                                            padding='8px'):
 
                     
                         with st_yled.container(background_color=st.session_state[f'{preview_selector_prefix}-dataframeHeaderBackgroundColor'],
@@ -548,17 +556,16 @@ with st.container(key="theme-main-container"):
                         st_yled.divider()
 
 
-
             if frame_type_select == "main":
                 
                 theme_size_input("baseFontSize", "Base Size", frame_type=frame_type_select, return_value_type="int", allowed_units=['px'])
-
                 theme_weight_input("baseFontWeight", "Base Weight", frame_type=frame_type_select)
 
 
         with st_yled.expander("More Font Options",
                             key="theme-font-ext-expander",
                             border_width='0px',
+                            padding='0px',
                             background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT):
 
             font_ext_cont = st.container(key="theme-font-ext-container")
@@ -604,14 +611,16 @@ with st.container(key="theme-main-container"):
             with st_yled.container(
                 key="border-preview",
                 background_color=st.session_state[f'{preview_selector_prefix}-backgroundColor'],
-                border = False
+                border = False,
+                padding='16px'
             ):
 
                 # Border Color Preview
                 with st_yled.container(border_width='3px',
                                             border_style='solid',
                                             border_color=st.session_state[f'{preview_selector_prefix}-borderColor'],
-                                            key="bordercolor-preview"):
+                                            key="bordercolor-preview",
+                                            padding='8px'):
 
                     st_yled.markdown("**Border Color**")
 
