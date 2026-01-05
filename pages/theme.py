@@ -361,7 +361,7 @@ init_theme_session_state('theme-sidebar-codeFontWeight', uiconfig.SIDEBAR_CODE_F
 
 with st.container(key="theme-main-container"):
 
-    st.markdown("**> Theme** Configure global styling of your Streamlit App")
+    st.markdown("**> Theme** Configure global styling of your Streamlit app")
 
     tab_color, tab_font, tab_border, tab_radius = st_yled.tabs(
         ["Color", "Font", "Border", "Radius"],
