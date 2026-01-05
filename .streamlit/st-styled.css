@@ -368,3 +368,43 @@ Theme Export */
 .st-key-theme-heading-font-weight-input-container hr {
     margin: 0px;
 }
+
+/* 
+    Components Page
+*/
+
+
+.st-key-components-main-container .stPageLink a p,
+.st-key-components-main-container .stPageLink a span {
+    color: #ff4b4b;
+}
+
+.st-key-components-main-container .stPageLink a {
+    border: 1px solid #ff4b4b;
+}
+
+[class*='component-card-'] {
+  gap: 0px;
+}
+
+[class*='component-card-']:hover {
+    background-color: #f1f1f1 !important;
+}
+
+.st-key-component-detail-title h1 {
+    padding: 0px;
+    margin-bottom: 8px;
+}
+
+[class*='component-detail-header-'] p {
+  margin-bottom: 8px;
+}
+
+.st-key-component-detail-main-container .stPageLink a {
+    height: 40px;
+    border: 2px solid #97a6c326;
+}
+
+ul[data-testid="stSidebarNavItems"] li:has(a[href$="component-detail"]) {
+    display: none;
+}
