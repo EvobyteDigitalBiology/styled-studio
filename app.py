@@ -313,6 +313,39 @@ def render_export_elements():
     # Required format
     # element name -> css property -> value
 
+
+
+def render_export_components():
+
+    st_yled.init()
+
+    st.markdown("""
+    Using new components in your app is super easy! Every component described here is available from the [st_yled Python package](https://st-styled.evo-byte.com/).
+    Here are a few examples how to use them in your Streamlit app.
+    """)
+
+    st.write("")
+    st.markdown("**Example: Perform a page redirect**")
+    
+    st_yled.code("""
+if st_yled.button("Go to Streamlit website"):
+    st_yled.redirect("https://streamlit.io")""")
+
+    st.write("")
+    st.markdown("**Example: Card Component**")
+    
+    st_yled.code("""
+st_yled.badge_card_one(
+    badge_text="New",
+    badge_icon=":material/star:",
+    title="Badge Card",
+    text="A card with a badge")
+""")
+    
+    if st.button("Close", type='secondary', width=90):
+        st.rerun()
+
+
 # region Dialogs
 
 @st.dialog(title="Export to your app", width="medium")
@@ -332,8 +365,9 @@ def export_config_toml():
         export_page = "theme"
     elif url[0] == "elements":
         export_page = "elements"
+    elif url[0] == "components" or url[0].startswith("component-detail"):
+        export_page = "components"
     else:
-        
         # TODO Fix Here
         st.error("Invalid Export Page Selected")
         raise ValueError("Invalid URL")
@@ -343,6 +377,11 @@ def export_config_toml():
         render_export_theme(uiconfig.CONFIG_TOML_TEMPLATE_PATH)
     elif export_page == "elements":
         render_export_elements()
+    elif export_page == "components":
+        render_export_components()
+    else:
+        st.error("Invalid Export Page Selected")
+        raise ValueError("Invalid Export Page")
 
 
 @st.dialog("Getting help", width="medium")
@@ -435,6 +474,33 @@ def render_help_dialog():
                 "More information in the [st-styled Python package](https://st-styled.evo-byte.com/)",
                 font_size="12px",
                 key="help-elements-styled-docs-link")
+
+
+    st.markdown("""
+    On the New Components page you can find new Streamlit components available from the st_yled package.
+    """)
+
+    with st_yled.expander("More on **New Components**",
+                            border_width=0,
+                            background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
+                            key="help-dialog-new-components-expander",
+                            padding="0px"):
+
+        with st_yled.container(key="help-dialog-new-components-expander-content",
+                               background_color="#f7f8fa",
+                               padding="16px"):
+
+            st_yled.markdown("""
+            The st_yled package comes with new components that extend the default Streamlit functionality.
+            Those components are designed to help you build even more engaging and interactive apps, faster and easier.
+            Each component comes with documentation, usage patterns and code examples to get you started quickly.
+                             
+            Explore the available components and integrate them into your apps to enhance user experience.
+            Send us a message if you have ideas for new components you would like to see!
+            """,
+            key="help-dialog-more-on-new-components-markdown")
+
+    st.write("")
 
     st.markdown("""
     Click *Export to your app* when you are happy with your styling. 
@@ -540,8 +606,11 @@ st_yled.init()
 
 theme_page = st.Page("pages/theme.py", title="Theme")
 element_page = st.Page("pages/elements.py", title="Elements")
+components_page = st.Page("pages/components.py", title="New Components")
+components_detail = st.Page("pages/component_detail.py", title="Component Detail", url_path="component-detail")
+
  
-pg = st.navigation([theme_page, element_page])
+pg = st.navigation([theme_page, element_page, components_page, components_detail])
 
 st.set_page_config(page_title="st_yled studio",
                     page_icon="assets/st_yled Logo.png")
