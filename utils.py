@@ -1,9 +1,10 @@
-from typing import Literal
+from typing import Dict, Literal
 
 import streamlit as st
 import st_yled
 
 import converters
+from uidataclasses import StyledComponent
 
 
 CATEGORY_SLUGS = {
@@ -207,7 +208,16 @@ def base_size_input(key,
             on_change=update_st_size_unit_from_input,
             args=(key, key + "-unit-" + seed_value, number_value, return_value_type)
         )
-        
+
+
+def load_components() -> Dict[str, StyledComponent]:
+
+    components = st_yled.constants.COMPONENTS
+    components = {slug: StyledComponent(**component) for slug, component in components.items()}
+
+    return components
+
+
         # if number_value:
 
         #     number_value = round(number_value,1)
