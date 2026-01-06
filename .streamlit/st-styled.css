@@ -116,11 +116,13 @@ div[data-testid="stSidebarNavLinkContainer"] span {
     position: relative;
     top: -50px;
     flex-flow: row;
-    align-items: end;
 }
 
 .st-key-secondary-color-preview p {
+    position: relative;
+    top: 48px;
     text-align: right;
+    margin-bottom: 0px;
 }
 
 .st-key-textcolor-preview {
