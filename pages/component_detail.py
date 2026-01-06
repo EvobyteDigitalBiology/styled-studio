@@ -9,6 +9,10 @@ st_yled.init()
 qparams = st.query_params
 components = utils.load_components()
 
+# Check if selected qparam was changed
+if not 'current_component_slug' in st.session_state:
+    st.session_state['current_component_slug'] = None
+
 if not 'show_code_example' in st.session_state:
     st.session_state['show_code_example'] = False
 
@@ -84,12 +88,17 @@ def main(slug, select_component: StyledComponent):
 
 
 #region DATA
-
 with st.container(key="component-detail-main-container"):
 
     if "component" in qparams:
 
         select_slug = qparams["component"]
+
+        # Reset show code example if component changed
+        if st.session_state['current_component_slug'] != select_slug:
+            st.session_state['current_component_slug'] = select_slug
+            st.session_state['show_code_example'] = False
+
         if select_slug in components:
             select_component = components[select_slug]
             main(select_slug, select_component)
