@@ -4,47 +4,50 @@ import streamlit as st
 import st_yled
 
 import uiconfig
-import converters
 import utils
 
 import uuid
 
 st_yled.init()
 
+
 def init_theme_session_state(key: str, default_value: str):
     """Initialize session state variables for theme settings with default values."""
-    
+
     if key not in st.session_state:
         st.session_state[key] = default_value
-        st.session_state[f'{key}-default'] = default_value
+        st.session_state[f"{key}-default"] = default_value
+
 
 def update_st_from_input(theme_property: str, input_selector_key: str):
     st.session_state[theme_property] = st.session_state[input_selector_key]
 
-def reset_defaults(keys: list[str]):
 
+def reset_defaults(keys: list[str]):
     for key in keys:
         default_key = f"{key}-default"
         if default_key in st.session_state:
             st.session_state[key] = st.session_state[default_key]
-    
-        key_seed = key + '-seed'
+
+        key_seed = key + "-seed"
 
         if key_seed in st.session_state:
             del st.session_state[key_seed]
 
+
 def reset_seed(key: str):
     del st.session_state[key]
 
-def frame_select_reset_bar(key: str, reset_keys: list[str]):
-    
-    with st.container(key=f"{key}-container",
-                        horizontal=True,
-                        horizontal_alignment="distribute"):
 
-        frame_type = utils.segmented_control_toggle(":material/width_full: Main",
-                                                    ":material/side_navigation: Sidebar",
-                                                    key=f"{key}-toggle")
+def frame_select_reset_bar(key: str, reset_keys: list[str]):
+    with st.container(
+        key=f"{key}-container", horizontal=True, horizontal_alignment="distribute"
+    ):
+        frame_type = utils.segmented_control_toggle(
+            ":material/width_full: Main",
+            ":material/side_navigation: Sidebar",
+            key=f"{key}-toggle",
+        )
 
         if frame_type == ":material/side_navigation: Sidebar":
             frame_type_select = "sidebar"
@@ -60,38 +63,39 @@ def frame_select_reset_bar(key: str, reset_keys: list[str]):
             "Reset",
             icon=":material/settings_backup_restore:",
             on_click=reset_defaults,
-            args= (reset_keys,),
-            font_size='14px',
+            args=(reset_keys,),
+            font_size="14px",
             key=f"{key}-reset-button",
-            border_style='none',
+            border_style="none",
         )
 
         return frame_type_select, preview_selector_prefix
 
 
-def theme_color_picker(theme_property: str,
-                        label: str,
-                        label_font_size: str = '20px',
-                        label_field_width: int = 140,
-                        frame_type: Literal["main", "sidebar"] = "main"):
-
+def theme_color_picker(
+    theme_property: str,
+    label: str,
+    label_font_size: str = "20px",
+    label_field_width: int = 140,
+    frame_type: Literal["main", "sidebar"] = "main",
+):
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
-    
+
     session_state_key = f"theme-{theme_property}"
     session_state_key_default = f"{session_state_key}-default"
 
     # Create a unique seed for component
     input_seed_key = f"theme-{theme_property}-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     color_state_value = st.session_state[session_state_key]
 
-    color_is_default = color_state_value == st.session_state[session_state_key_default] 
+    color_is_default = color_state_value == st.session_state[session_state_key_default]
 
-    code_color = 'grey' if color_is_default else None
+    code_color = "grey" if color_is_default else None
 
     utils.base_color_picker(
         key=session_state_key,
@@ -101,62 +105,64 @@ def theme_color_picker(theme_property: str,
         label_field_width=label_field_width,
         color_state_value=color_state_value,
         code_color=code_color,
-        caption_width=100
+        caption_width=100,
     )
 
 
-def theme_checkbox(theme_property: str,
-                   label: str,
-                   label_font_size: str = '20px',
-                   label_field_width: int = 140,
-                   frame_type: Literal["main", "sidebar"] = "main"):
-    
+def theme_checkbox(
+    theme_property: str,
+    label: str,
+    label_font_size: str = "20px",
+    label_field_width: int = 140,
+    frame_type: Literal["main", "sidebar"] = "main",
+):
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
-    
+
     session_state_key = f"theme-{theme_property}"
 
     # Create a unique seed for component
     input_seed_key = f"theme-{theme_property}-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     with st.container(horizontal=True, vertical_alignment="center"):
-
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
         st_yled.checkbox(
-            'Enable',
+            "Enable",
             label_visibility="collapsed",
             value=st.session_state[session_state_key],
             key=theme_property + "-checkbox-" + st.session_state[input_seed_key],
             on_change=update_st_from_input,
-            args=(session_state_key, theme_property + "-checkbox-" + st.session_state[input_seed_key])
+            args=(
+                session_state_key,
+                theme_property + "-checkbox-" + st.session_state[input_seed_key],
+            ),
         )
 
         st_yled.caption("Enable", width=100)
 
 
-
-
-def theme_size_input(theme_property: str,
-                        label: str,
-                        label_font_size: str = '20px',
-                        label_field_width: int = 140,
-                        allowed_units: list[str] = ['px', 'rem'],
-                        frame_type: Literal["main", "sidebar"] = "main",
-                        return_value_type: Literal["tuple", "int"] = "tuple"):
-    
+def theme_size_input(
+    theme_property: str,
+    label: str,
+    label_font_size: str = "20px",
+    label_field_width: int = 140,
+    allowed_units: list[str] = ["px", "rem"],
+    frame_type: Literal["main", "sidebar"] = "main",
+    return_value_type: Literal["tuple", "int"] = "tuple",
+):
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
-    
+
     session_state_key = f"theme-{theme_property}"
-    
+
     # Create a unique seed for component
     input_seed_key = f"theme-{theme_property}-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     # Get current value tuple or parse from string
@@ -175,41 +181,41 @@ def theme_size_input(theme_property: str,
         seed_value=st.session_state[input_seed_key],
         label=label,
         value=current_number,
-        step_size=0.1 if current_unit == 'rem' else 1.0,
+        step_size=0.1 if current_unit == "rem" else 1.0,
         unit=current_unit,
         allowed_units=allowed_units,
         label_font_size=label_font_size,
         label_field_width=label_field_width,
-        return_value_type=return_value_type
+        return_value_type=return_value_type,
     )
 
 
-def theme_font_input(theme_property: str,
-                    label: str,
-                    label_font_size: str = '20px',
-                    label_field_width: int = 140,
-                    frame_type: Literal["main", "sidebar"] = "main",
-                    key: Optional[str] = None):
-    
+def theme_font_input(
+    theme_property: str,
+    label: str,
+    label_font_size: str = "20px",
+    label_field_width: int = 140,
+    frame_type: Literal["main", "sidebar"] = "main",
+    key: Optional[str] = None,
+):
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
-    
+
     session_state_key = f"theme-{theme_property}"
-    
+
     # Create a unique seed for component
     input_seed_key = f"theme-{theme_property}-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     # Get current value tuple or parse from string
     current_value = st.session_state[session_state_key]
 
     with st.container(horizontal=True, vertical_alignment="center", key=key):
-
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
-        options = ['sans-serif', 'serif', 'monospace', 'Google Fonts']
+        options = ["sans-serif", "serif", "monospace", "Google Fonts"]
         index_select = options.index(current_value) if current_value in options else 3
 
         # Number input
@@ -218,20 +224,19 @@ def theme_font_input(theme_property: str,
             options=options,
             index=index_select,
             width=150,
-            key = theme_property + "-font-select-" + st.session_state[input_seed_key]
+            key=theme_property + "-font-select-" + st.session_state[input_seed_key],
         )
 
         if font_value == "Google Fonts":
-            
             if current_value not in options:
                 current_value = current_value.split(":")
                 family_name_value = current_value[0].strip("'")
-                font_url_value = ':'.join(current_value[1:])
+                font_url_value = ":".join(current_value[1:])
             else:
-                family_name_value, font_url_value = '', ''
+                family_name_value, font_url_value = "", ""
 
             family_name = st.text_input(
-                f"Name",
+                "Name",
                 value=family_name_value,
                 key=theme_property + "-font-family",
                 width=100,
@@ -241,20 +246,17 @@ def theme_font_input(theme_property: str,
                 "Google Fonts URL",
                 value=font_url_value,
                 key=theme_property + "-font-url",
-                help= "More information on \n[Google Fonts in Streamlit](https://docs.streamlit.io/develop/tutorials/configuration-and-theming/external-fonts)",
+                help="More information on \n[Google Fonts in Streamlit](https://docs.streamlit.io/develop/tutorials/configuration-and-theming/external-fonts)",
                 width=240,
             )
 
-            font_value = f"\'{family_name}\':{font_url}"
+            font_value = f"'{family_name}':{font_url}"
 
         # Update session state with tuple value
         st.session_state[session_state_key] = font_value
 
 
-
-def update_base_weight_from_input(theme_property: str,
-                                    input_selector_key: str):
-
+def update_base_weight_from_input(theme_property: str, input_selector_key: str):
     # Reset if input selector is none
     if st.session_state[input_selector_key] is None:
         del st.session_state[theme_property]
@@ -263,28 +265,28 @@ def update_base_weight_from_input(theme_property: str,
         st.session_state[theme_property] = new_value
 
 
-def theme_weight_input(theme_property: str,
-                        label: str,
-                        label_font_size: str = '20px',
-                        label_field_width: int = 140,
-                        frame_type: Literal["main", "sidebar"] = "main"):
-    
+def theme_weight_input(
+    theme_property: str,
+    label: str,
+    label_font_size: str = "20px",
+    label_field_width: int = 140,
+    frame_type: Literal["main", "sidebar"] = "main",
+):
     if frame_type == "sidebar":
         theme_property = "sidebar-" + theme_property
-    
+
     session_state_key = f"theme-{theme_property}"
-    
+
     # Create a unique seed for component
     input_seed_key = f"theme-{theme_property}-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     # Get current value tuple or parse from string
     current_value = st.session_state[session_state_key]
 
     with st.container(horizontal=True, vertical_alignment="center", width=400):
-
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
         # Number input
@@ -298,79 +300,118 @@ def theme_weight_input(theme_property: str,
             label_visibility="collapsed",
             width=138,
             on_change=update_base_weight_from_input,
-            args=(session_state_key, session_state_key + "-number-" + st.session_state[input_seed_key])
+            args=(
+                session_state_key,
+                session_state_key + "-number-" + st.session_state[input_seed_key],
+            ),
         )
 
 
 # Initialize main theme session state
-init_theme_session_state('theme-primaryColor', uiconfig.PRIMARY_COLOR_DEFAULT)
-init_theme_session_state('theme-backgroundColor', uiconfig.BACKGROUND_COLOR_DEFAULT)
-init_theme_session_state('theme-secondaryBackgroundColor', uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT)
-init_theme_session_state('theme-textColor', uiconfig.TEXT_COLOR_DEFAULT)
-init_theme_session_state('theme-linkColor', uiconfig.LINK_COLOR_DEFAULT)
-init_theme_session_state('theme-codeBackgroundColor', uiconfig.CODE_BG_COLOR_DEFAULT)
-init_theme_session_state('theme-dataframeBorderColor', uiconfig.DATAFRAME_BORDER_COLOR_DEFAULT)
-init_theme_session_state('theme-dataframeHeaderBackgroundColor', uiconfig.DATAFRAME_HEADER_BG_COLOR_DEFAULT)
+init_theme_session_state("theme-primaryColor", uiconfig.PRIMARY_COLOR_DEFAULT)
+init_theme_session_state("theme-backgroundColor", uiconfig.BACKGROUND_COLOR_DEFAULT)
+init_theme_session_state(
+    "theme-secondaryBackgroundColor", uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT
+)
+init_theme_session_state("theme-textColor", uiconfig.TEXT_COLOR_DEFAULT)
+init_theme_session_state("theme-linkColor", uiconfig.LINK_COLOR_DEFAULT)
+init_theme_session_state("theme-codeBackgroundColor", uiconfig.CODE_BG_COLOR_DEFAULT)
+init_theme_session_state(
+    "theme-dataframeBorderColor", uiconfig.DATAFRAME_BORDER_COLOR_DEFAULT
+)
+init_theme_session_state(
+    "theme-dataframeHeaderBackgroundColor", uiconfig.DATAFRAME_HEADER_BG_COLOR_DEFAULT
+)
 
 # Initialize sidebar theme session state
-init_theme_session_state('theme-sidebar-primaryColor', uiconfig.SIDEBAR_PRIMARY_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-backgroundColor', uiconfig.SIDEBAR_BACKGROUND_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-secondaryBackgroundColor', uiconfig.SIDEBAR_SECONDARY_BACKGROUND_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-textColor', uiconfig.SIDEBAR_TEXT_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-linkColor', uiconfig.SIDEBAR_LINK_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-codeBackgroundColor', uiconfig.SIDEBAR_CODE_BG_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-dataframeBorderColor', uiconfig.SIDEBAR_DATAFRAME_BORDER_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-dataframeHeaderBackgroundColor', uiconfig.SIDEBAR_DATAFRAME_HEADER_BG_COLOR_DEFAULT)
+init_theme_session_state(
+    "theme-sidebar-primaryColor", uiconfig.SIDEBAR_PRIMARY_COLOR_DEFAULT
+)
+init_theme_session_state(
+    "theme-sidebar-backgroundColor", uiconfig.SIDEBAR_BACKGROUND_COLOR_DEFAULT
+)
+init_theme_session_state(
+    "theme-sidebar-secondaryBackgroundColor",
+    uiconfig.SIDEBAR_SECONDARY_BACKGROUND_COLOR_DEFAULT,
+)
+init_theme_session_state("theme-sidebar-textColor", uiconfig.SIDEBAR_TEXT_COLOR_DEFAULT)
+init_theme_session_state("theme-sidebar-linkColor", uiconfig.SIDEBAR_LINK_COLOR_DEFAULT)
+init_theme_session_state(
+    "theme-sidebar-codeBackgroundColor", uiconfig.SIDEBAR_CODE_BG_COLOR_DEFAULT
+)
+init_theme_session_state(
+    "theme-sidebar-dataframeBorderColor",
+    uiconfig.SIDEBAR_DATAFRAME_BORDER_COLOR_DEFAULT,
+)
+init_theme_session_state(
+    "theme-sidebar-dataframeHeaderBackgroundColor",
+    uiconfig.SIDEBAR_DATAFRAME_HEADER_BG_COLOR_DEFAULT,
+)
 
 # Initialize border theme session state
-init_theme_session_state('theme-borderColor', uiconfig.BORDER_COLOR_DEFAULT)
-init_theme_session_state('theme-showWidgetBorder', uiconfig.SHOW_INPUT_WIDGET_BORDER_DEFAULT)
-init_theme_session_state('theme-showSidebarBorder', uiconfig.SHOW_SIDEBAR_BORDER_DEFAULT)
+init_theme_session_state("theme-borderColor", uiconfig.BORDER_COLOR_DEFAULT)
+init_theme_session_state(
+    "theme-showWidgetBorder", uiconfig.SHOW_INPUT_WIDGET_BORDER_DEFAULT
+)
+init_theme_session_state(
+    "theme-showSidebarBorder", uiconfig.SHOW_SIDEBAR_BORDER_DEFAULT
+)
 
 # Initialize sidebar border theme session state
-init_theme_session_state('theme-sidebar-borderColor', uiconfig.SIDEBAR_BORDER_COLOR_DEFAULT)
-init_theme_session_state('theme-sidebar-showWidgetBorder', uiconfig.SIDEBAR_SHOW_INPUT_WIDGET_BORDER_DEFAULT)
+init_theme_session_state(
+    "theme-sidebar-borderColor", uiconfig.SIDEBAR_BORDER_COLOR_DEFAULT
+)
+init_theme_session_state(
+    "theme-sidebar-showWidgetBorder", uiconfig.SIDEBAR_SHOW_INPUT_WIDGET_BORDER_DEFAULT
+)
 
 # Initialize radius theme session state
-init_theme_session_state('theme-baseRadius', uiconfig.BASE_RADIUS_DEFAULT)
-init_theme_session_state('theme-buttonRadius', uiconfig.BUTTON_RADIUS_DEFAULT)
+init_theme_session_state("theme-baseRadius", uiconfig.BASE_RADIUS_DEFAULT)
+init_theme_session_state("theme-buttonRadius", uiconfig.BUTTON_RADIUS_DEFAULT)
 
 # Initialize sidebar radius theme session state
-init_theme_session_state('theme-sidebar-baseRadius', uiconfig.SIDEBAR_BASE_RADIUS_DEFAULT)
-init_theme_session_state('theme-sidebar-buttonRadius', uiconfig.SIDEBAR_BUTTON_RADIUS_DEFAULT)
+init_theme_session_state(
+    "theme-sidebar-baseRadius", uiconfig.SIDEBAR_BASE_RADIUS_DEFAULT
+)
+init_theme_session_state(
+    "theme-sidebar-buttonRadius", uiconfig.SIDEBAR_BUTTON_RADIUS_DEFAULT
+)
 
 # Initialize sidebar font theme session state
-init_theme_session_state('theme-font', uiconfig.FONT_DEFAULT)
-init_theme_session_state('theme-headingFont', uiconfig.HEADING_FONT_DEFAULT)
-init_theme_session_state('theme-baseFontSize', uiconfig.BASE_FONT_SIZE_DEFAULT)
-init_theme_session_state('theme-baseFontWeight', uiconfig.BASE_FONT_WEIGHT_DEFAULT)
+init_theme_session_state("theme-font", uiconfig.FONT_DEFAULT)
+init_theme_session_state("theme-headingFont", uiconfig.HEADING_FONT_DEFAULT)
+init_theme_session_state("theme-baseFontSize", uiconfig.BASE_FONT_SIZE_DEFAULT)
+init_theme_session_state("theme-baseFontWeight", uiconfig.BASE_FONT_WEIGHT_DEFAULT)
 
-init_theme_session_state('theme-codeFont', uiconfig.CODE_FONT_DEFAULT)
-init_theme_session_state('theme-codeFontSize', uiconfig.CODE_FONT_SIZE_DEFAULT)
-init_theme_session_state('theme-codeFontWeight', uiconfig.CODE_FONT_WEIGHT_DEFAULT)
+init_theme_session_state("theme-codeFont", uiconfig.CODE_FONT_DEFAULT)
+init_theme_session_state("theme-codeFontSize", uiconfig.CODE_FONT_SIZE_DEFAULT)
+init_theme_session_state("theme-codeFontWeight", uiconfig.CODE_FONT_WEIGHT_DEFAULT)
 
-init_theme_session_state('theme-sidebar-font', uiconfig.SIDEBAR_FONT_DEFAULT)
-init_theme_session_state('theme-sidebar-headingFont', uiconfig.SIDEBAR_HEADING_FONT_DEFAULT)
+init_theme_session_state("theme-sidebar-font", uiconfig.SIDEBAR_FONT_DEFAULT)
+init_theme_session_state(
+    "theme-sidebar-headingFont", uiconfig.SIDEBAR_HEADING_FONT_DEFAULT
+)
 
-init_theme_session_state('theme-sidebar-codeFont', uiconfig.SIDEBAR_CODE_FONT_DEFAULT)
-init_theme_session_state('theme-sidebar-codeFontSize', uiconfig.SIDEBAR_CODE_FONT_SIZE_DEFAULT)
-init_theme_session_state('theme-sidebar-codeFontWeight', uiconfig.SIDEBAR_CODE_FONT_WEIGHT_DEFAULT)
+init_theme_session_state("theme-sidebar-codeFont", uiconfig.SIDEBAR_CODE_FONT_DEFAULT)
+init_theme_session_state(
+    "theme-sidebar-codeFontSize", uiconfig.SIDEBAR_CODE_FONT_SIZE_DEFAULT
+)
+init_theme_session_state(
+    "theme-sidebar-codeFontWeight", uiconfig.SIDEBAR_CODE_FONT_WEIGHT_DEFAULT
+)
 
 # region UI
 
 
 with st.container(key="theme-main-container"):
-
     st.markdown("**> Theme** Configure global styling of your Streamlit app")
 
     tab_color, tab_font, tab_border, tab_radius = st_yled.tabs(
-        ["Color", "Font", "Border", "Radius"],
-        key = "theme-tabs"
+        ["Color", "Font", "Border", "Radius"], key="theme-tabs"
     )
 
-    #region Color Tabs
+    # region Color Tabs
     with tab_color:
-        
         frame_type_select, preview_selector_prefix = frame_select_reset_bar(
             key="theme-color-frame-reset-bar",
             reset_keys=[
@@ -382,125 +423,176 @@ with st.container(key="theme-main-container"):
                 "codeBackgroundColor",
                 "dataframeBorderColor",
                 "dataframeHeaderBackgroundColor",
-            ]
+            ],
         )
 
         color_cont = st.container(key="theme-color-container")
 
-        col1, col2 = color_cont.columns([2,1])
+        col1, col2 = color_cont.columns([2, 1])
 
         # Define Color Pickers
         with col1.container(key="color-selectors"):
-
             theme_color_picker("primaryColor", "Primary", frame_type=frame_type_select)
 
-            theme_color_picker("backgroundColor", "Background", frame_type=frame_type_select)
+            theme_color_picker(
+                "backgroundColor", "Background", frame_type=frame_type_select
+            )
 
-            theme_color_picker("secondaryBackgroundColor", "Secondary Background", frame_type=frame_type_select)
+            theme_color_picker(
+                "secondaryBackgroundColor",
+                "Secondary Background",
+                frame_type=frame_type_select,
+            )
 
             theme_color_picker("textColor", "Text", frame_type=frame_type_select)
 
         # Preview Pane
         with col2:
-
             with st_yled.container(
                 key="color-preview",
-                background_color=st.session_state[f'{preview_selector_prefix}-backgroundColor'],
-                border = False,
-                padding='16px',
-                padding_bottom='64px'
+                background_color=st.session_state[
+                    f"{preview_selector_prefix}-backgroundColor"
+                ],
+                border=False,
+                padding="16px",
+                padding_bottom="64px",
             ):
                 bg_test = st.container(
                     horizontal=True,
                     horizontal_alignment="right",
                 )
-    
-                bg_test.markdown("**Background**", width='content')
+
+                bg_test.markdown("**Background**", width="content")
 
                 with st_yled.container(
                     key="primary-color-preview",
-                    background_color=st.session_state[f'{preview_selector_prefix}-primaryColor'],
+                    background_color=st.session_state[
+                        f"{preview_selector_prefix}-primaryColor"
+                    ],
                     height=128,
                     width=112,
-                    padding='8px'
+                    padding="8px",
                 ):
-                    st_yled.markdown("**Primary**", width='content', color='#FFFFFF', key="primary-color-preview-text")
+                    st_yled.markdown(
+                        "**Primary**",
+                        width="content",
+                        color="#FFFFFF",
+                        key="primary-color-preview-text",
+                    )
 
-                
                 with st.container(horizontal=True, horizontal_alignment="right"):
-                    
                     with st_yled.container(
                         key="secondary-color-preview",
-                        background_color=st.session_state[f'{preview_selector_prefix}-secondaryBackgroundColor'],
+                        background_color=st.session_state[
+                            f"{preview_selector_prefix}-secondaryBackgroundColor"
+                        ],
                         height=112,
                         width=112,
                         horizontal=True,
                         horizontal_alignment="right",
-                        padding='8px'
+                        padding="8px",
                     ):
-                        st_yled.markdown("**Secondary Background**", width='content', )
+                        st_yled.markdown(
+                            "**Secondary Background**",
+                            width="content",
+                        )
 
-                st_yled.markdown("Textcolor",
-                                font_size='26px',
-                                key="textcolor-preview",
-                                color=st.session_state[f'{preview_selector_prefix}-textColor'] )
+                st_yled.markdown(
+                    "Textcolor",
+                    font_size="26px",
+                    key="textcolor-preview",
+                    color=st.session_state[f"{preview_selector_prefix}-textColor"],
+                )
 
                 st.markdown("")
-        
+
         # TODO: Expander BG Color
-        with st_yled.expander("More Color Options",
-                            key="theme-color-ext-expander",
-                            border_style='none',
-                            padding='0px',
-                            background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT):
-            
+        with st_yled.expander(
+            "More Color Options",
+            key="theme-color-ext-expander",
+            border_style="none",
+            padding="0px",
+            background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
+        ):
             color_ext_cont = st.container(key="theme-color-ext-container")
 
-            col1, col2 = color_ext_cont.columns([2,1])
+            col1, col2 = color_ext_cont.columns([2, 1])
 
             with col1:
-                with st_yled.container(key="color-ext-selectors", padding='16px'):
+                with st_yled.container(key="color-ext-selectors", padding="16px"):
+                    theme_color_picker(
+                        "linkColor",
+                        "Link",
+                        label_font_size="16px",
+                        label_field_width=100,
+                        frame_type=frame_type_select,
+                    )
 
-                    theme_color_picker("linkColor", "Link", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
+                    theme_color_picker(
+                        "codeBackgroundColor",
+                        "Code Background",
+                        label_font_size="16px",
+                        label_field_width=100,
+                        frame_type=frame_type_select,
+                    )
 
-                    theme_color_picker("codeBackgroundColor", "Code Background", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
+                    theme_color_picker(
+                        "dataframeHeaderBackgroundColor",
+                        "DataFrame Header",
+                        label_font_size="16px",
+                        label_field_width=100,
+                        frame_type=frame_type_select,
+                    )
 
-                    theme_color_picker("dataframeHeaderBackgroundColor", "DataFrame Header", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
-
-                    theme_color_picker("dataframeBorderColor", "DataFrame Border", label_font_size='16px', label_field_width=100, frame_type=frame_type_select)
+                    theme_color_picker(
+                        "dataframeBorderColor",
+                        "DataFrame Border",
+                        label_font_size="16px",
+                        label_field_width=100,
+                        frame_type=frame_type_select,
+                    )
 
             with col2:
-
                 with st_yled.container(
                     key="color-ext-preview",
-                    background_color=st.session_state[f'{preview_selector_prefix}-backgroundColor'],
-                    border = False,
-                    padding='16px'
+                    background_color=st.session_state[
+                        f"{preview_selector_prefix}-backgroundColor"
+                    ],
+                    border=False,
+                    padding="16px",
                 ):
+                    st_yled.markdown(
+                        "[Link Color](https://www.google.com)",
+                        color=st.session_state[f"{preview_selector_prefix}-linkColor"],
+                        key="linkcolor-preview",
+                    )
 
-                    st_yled.markdown("[Link Color](https://www.google.com)",
-                                    color=st.session_state[f'{preview_selector_prefix}-linkColor'],
-                                    key="linkcolor-preview")
+                    st_yled.code(
+                        '# Code Background\nprint("Hello")',
+                        background_color=st.session_state[
+                            f"{preview_selector_prefix}-codeBackgroundColor"
+                        ],
+                    )
 
-                    st_yled.code("# Code Background\nprint(\"Hello\")", background_color=st.session_state[f'{preview_selector_prefix}-codeBackgroundColor'],)
-
-
-                    with st_yled.container(key="dataframe-border-color-preview",
-                                            border_width='3px',
-                                            border_style='solid',
-                                            border_color=st.session_state[f'{preview_selector_prefix}-dataframeBorderColor'],
-                                            padding='8px'):
-
-                    
-                        with st_yled.container(background_color=st.session_state[f'{preview_selector_prefix}-dataframeHeaderBackgroundColor'],
-                                                key="dataframe-header-background-preview"):
-
+                    with st_yled.container(
+                        key="dataframe-border-color-preview",
+                        border_width="3px",
+                        border_style="solid",
+                        border_color=st.session_state[
+                            f"{preview_selector_prefix}-dataframeBorderColor"
+                        ],
+                        padding="8px",
+                    ):
+                        with st_yled.container(
+                            background_color=st.session_state[
+                                f"{preview_selector_prefix}-dataframeHeaderBackgroundColor"
+                            ],
+                            key="dataframe-header-background-preview",
+                        ):
                             st_yled.markdown("", width=24)
 
-                    
-    #region Font Tabs
+    # region Font Tabs
     with tab_font:
-        
         frame_type_select, preview_selector_prefix = frame_select_reset_bar(
             key="theme-font-frame-reset-bar",
             reset_keys=[
@@ -511,180 +603,267 @@ with st.container(key="theme-main-container"):
                 "codeFont",
                 "codeFontSize",
                 "codeFontWeight",
-            ])
+            ],
+        )
 
         font_cont = st.container(key="theme-font-container")
 
         with font_cont:
-            
-            with st_yled.container(key="theme-base-font-container", horizontal=True, gap='large'):
-
-                with st_yled.container(key="theme-base-font-input-container", horizontal=True, horizontal_alignment="left"):
-                    theme_font_input("font", "Base Font", frame_type=frame_type_select, key="theme-base-font-input")
+            with st_yled.container(
+                key="theme-base-font-container", horizontal=True, gap="large"
+            ):
+                with st_yled.container(
+                    key="theme-base-font-input-container",
+                    horizontal=True,
+                    horizontal_alignment="left",
+                ):
+                    theme_font_input(
+                        "font",
+                        "Base Font",
+                        frame_type=frame_type_select,
+                        key="theme-base-font-input",
+                    )
 
                 # Get preview font, size and weight
-                preview_font = st.session_state[f'{preview_selector_prefix}-font']
+                preview_font = st.session_state[f"{preview_selector_prefix}-font"]
 
                 if frame_type_select == "main":
-                    preview_size = st.session_state[f'{preview_selector_prefix}-baseFontSize']
-                    preview_weight = st.session_state[f'{preview_selector_prefix}-baseFontWeight']
+                    preview_size = st.session_state[
+                        f"{preview_selector_prefix}-baseFontSize"
+                    ]
+                    preview_weight = st.session_state[
+                        f"{preview_selector_prefix}-baseFontWeight"
+                    ]
                 else:
                     preview_size = 16
                     preview_weight = 400
 
                 # Show Preview, only if one of default fonts(sans-serif, serif, monospace) is selected. Skip for Google Fonts.
-                if preview_font in ['sans-serif', 'serif', 'monospace']:
-
-                    with st.container(key="theme-base-font-weight-input-container", horizontal_alignment="right", vertical_alignment="bottom"):
-                        
-                        st.html(f"<span style='font-family:{preview_font}; font-size:{preview_size}px; font-weight:{preview_weight};'>Base Font Preview</span>")
+                if preview_font in ["sans-serif", "serif", "monospace"]:
+                    with st.container(
+                        key="theme-base-font-weight-input-container",
+                        horizontal_alignment="right",
+                        vertical_alignment="bottom",
+                    ):
+                        st.html(
+                            f"<span style='font-family:{preview_font}; font-size:{preview_size}px; font-weight:{preview_weight};'>Base Font Preview</span>"
+                        )
                         st_yled.divider()
 
-            with st_yled.container(key="theme-heading-font-container", horizontal=True, gap='large'):
+            with st_yled.container(
+                key="theme-heading-font-container", horizontal=True, gap="large"
+            ):
+                with st_yled.container(
+                    key="theme-heading-font-input-container",
+                    horizontal=True,
+                    horizontal_alignment="left",
+                ):
+                    theme_font_input(
+                        "headingFont",
+                        "Heading Font",
+                        frame_type=frame_type_select,
+                        key="theme-heading-font-input",
+                    )
 
-                with st_yled.container(key="theme-heading-font-input-container", horizontal=True, horizontal_alignment="left"):
-                    theme_font_input("headingFont", "Heading Font", frame_type=frame_type_select, key="theme-heading-font-input")
-
-                heading_preview_font = st.session_state[f'{preview_selector_prefix}-headingFont']
+                heading_preview_font = st.session_state[
+                    f"{preview_selector_prefix}-headingFont"
+                ]
 
                 # Show Preview, only if one of default fonts(sans-serif, serif, monospace) is selected. Skip for Google Fonts.
-                if heading_preview_font in ['sans-serif', 'serif', 'monospace']:
-
-                    with st.container(key="theme-heading-font-weight-input-container", horizontal_alignment="right", vertical_alignment="bottom"):
-                        
-                        st.html(f"<span style='font-family:{heading_preview_font}; font-size:20px; font-weight:600;'>Heading Font Preview</span>")
+                if heading_preview_font in ["sans-serif", "serif", "monospace"]:
+                    with st.container(
+                        key="theme-heading-font-weight-input-container",
+                        horizontal_alignment="right",
+                        vertical_alignment="bottom",
+                    ):
+                        st.html(
+                            f"<span style='font-family:{heading_preview_font}; font-size:20px; font-weight:600;'>Heading Font Preview</span>"
+                        )
                         st_yled.divider()
 
-
             if frame_type_select == "main":
-                
-                theme_size_input("baseFontSize", "Base Size", frame_type=frame_type_select, return_value_type="int", allowed_units=['px'])
-                theme_weight_input("baseFontWeight", "Base Weight", frame_type=frame_type_select)
+                theme_size_input(
+                    "baseFontSize",
+                    "Base Size",
+                    frame_type=frame_type_select,
+                    return_value_type="int",
+                    allowed_units=["px"],
+                )
+                theme_weight_input(
+                    "baseFontWeight", "Base Weight", frame_type=frame_type_select
+                )
 
-
-        with st_yled.expander("More Font Options",
-                            key="theme-font-ext-expander",
-                            border_width='0px',
-                            padding='0px',
-                            background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT):
-
+        with st_yled.expander(
+            "More Font Options",
+            key="theme-font-ext-expander",
+            border_width="0px",
+            padding="0px",
+            background_color=uiconfig.SECONDARY_BACKGROUND_COLOR_DEFAULT,
+        ):
             font_ext_cont = st.container(key="theme-font-ext-container")
-            
+
             with font_ext_cont:
-                
-                theme_font_input("codeFont", "Code Font", label_font_size='16px', label_field_width=120, frame_type=frame_type_select)
+                theme_font_input(
+                    "codeFont",
+                    "Code Font",
+                    label_font_size="16px",
+                    label_field_width=120,
+                    frame_type=frame_type_select,
+                )
 
-                theme_size_input("codeFontSize", "Code Size", label_font_size='16px', label_field_width=120, frame_type=frame_type_select, return_value_type="tuple", allowed_units=['px', 'rem'])
+                theme_size_input(
+                    "codeFontSize",
+                    "Code Size",
+                    label_font_size="16px",
+                    label_field_width=120,
+                    frame_type=frame_type_select,
+                    return_value_type="tuple",
+                    allowed_units=["px", "rem"],
+                )
 
-                theme_weight_input("codeFontWeight", "Code Weight", label_font_size='16px', label_field_width=120, frame_type=frame_type_select)
+                theme_weight_input(
+                    "codeFontWeight",
+                    "Code Weight",
+                    label_font_size="16px",
+                    label_field_width=120,
+                    frame_type=frame_type_select,
+                )
 
-    #region Border Tab
+    # region Border Tab
 
     with tab_border:
-
         frame_type_select, preview_selector_prefix = frame_select_reset_bar(
             key="theme-border-frame-reset-bar",
             reset_keys=[
                 "borderColor",
                 "showWidgetBorder",
                 "showSidebarBorder",
-            ]
+            ],
         )
 
         border_cont = st.container(key="theme-border-container")
 
-        col1, col2 = border_cont.columns([2,1])
+        col1, col2 = border_cont.columns([2, 1])
 
         # Define Color Pickers
         with col1.container(key="border-selectors"):
+            theme_color_picker(
+                "borderColor",
+                "Border Color",
+                label_font_size="20px",
+                frame_type=frame_type_select,
+            )
 
-            theme_color_picker("borderColor", "Border Color", label_font_size='20px', frame_type=frame_type_select)
-
-            theme_checkbox("showWidgetBorder", "Widget Border", label_font_size='20px', frame_type=frame_type_select)
+            theme_checkbox(
+                "showWidgetBorder",
+                "Widget Border",
+                label_font_size="20px",
+                frame_type=frame_type_select,
+            )
 
             if frame_type_select == "main":
-                theme_checkbox("showSidebarBorder", "Sidebar Border", label_font_size='20px', frame_type=frame_type_select)
+                theme_checkbox(
+                    "showSidebarBorder",
+                    "Sidebar Border",
+                    label_font_size="20px",
+                    frame_type=frame_type_select,
+                )
 
         # Preview Pane
         with col2:
-
             with st_yled.container(
                 key="border-preview",
-                background_color=st.session_state[f'{preview_selector_prefix}-backgroundColor'],
-                border = False,
-                padding='16px'
+                background_color=st.session_state[
+                    f"{preview_selector_prefix}-backgroundColor"
+                ],
+                border=False,
+                padding="16px",
             ):
-
                 # Border Color Preview
-                with st_yled.container(border_width='3px',
-                                            border_style='solid',
-                                            border_color=st.session_state[f'{preview_selector_prefix}-borderColor'],
-                                            key="bordercolor-preview",
-                                            padding='8px'):
-
+                with st_yled.container(
+                    border_width="3px",
+                    border_style="solid",
+                    border_color=st.session_state[
+                        f"{preview_selector_prefix}-borderColor"
+                    ],
+                    key="bordercolor-preview",
+                    padding="8px",
+                ):
                     st_yled.markdown("**Border Color**")
 
                 # Input Widget Border Preview
-                if st.session_state[f'{preview_selector_prefix}-showWidgetBorder']:
-                    st_yled.text_input("Input Widget Border", border_width='2px', border_style='solid', border_color=st.session_state[f'{preview_selector_prefix}-borderColor'])
+                if st.session_state[f"{preview_selector_prefix}-showWidgetBorder"]:
+                    st_yled.text_input(
+                        "Input Widget Border",
+                        border_width="2px",
+                        border_style="solid",
+                        border_color=st.session_state[
+                            f"{preview_selector_prefix}-borderColor"
+                        ],
+                    )
                 else:
                     st_yled.text_input("Input Widget Border")
 
                 # Sidebar Border Preview
                 if frame_type_select == "main":
-
                     with st_yled.container(
-                        key="sidebar-border-preview",
-                        width = 120,
-                        horizontal=True
-                    ):  
-                        
-                        if st.session_state[f'{preview_selector_prefix}-showSidebarBorder']:
+                        key="sidebar-border-preview", width=120, horizontal=True
+                    ):
+                        if st.session_state[
+                            f"{preview_selector_prefix}-showSidebarBorder"
+                        ]:
                             css = f"""
                             .st-key-sidebar-border-box-preview {{
                                 border-right: 2px solid {st.session_state[f'{preview_selector_prefix}-borderColor']};
                             }}
                             """
-                            st.html(f"<style>{css}</style>")                    
+                            st.html(f"<style>{css}</style>")
 
-                        with st.container(
-                            width=40,
-                            key="sidebar-border-box-preview"
-                        ):
+                        with st.container(width=40, key="sidebar-border-box-preview"):
                             st.write(" ")
 
-    #region Radius Tab
+    # region Radius Tab
 
     with tab_radius:
-
         frame_type_select, preview_selector_prefix = frame_select_reset_bar(
             key="theme-radius-frame-reset-bar",
             reset_keys=[
                 "baseRadius",
                 "buttonRadius",
-            ]
+            ],
         )
-        
+
         radius_cont = st.container(key="theme-radius-container")
 
-        col1, col2 = radius_cont.columns([2,1])
+        col1, col2 = radius_cont.columns([2, 1])
 
         # Define Radius Selectors
         with col1.container(key="radius-selectors"):
-
-            theme_size_input("baseRadius", "Base Radius", label_font_size='20px', frame_type=frame_type_select)
-            theme_size_input("buttonRadius", "Button Radius", label_font_size='20px', frame_type=frame_type_select)
+            theme_size_input(
+                "baseRadius",
+                "Base Radius",
+                label_font_size="20px",
+                frame_type=frame_type_select,
+            )
+            theme_size_input(
+                "buttonRadius",
+                "Button Radius",
+                label_font_size="20px",
+                frame_type=frame_type_select,
+            )
 
         # Preview Pane
         with col2:
-
             with st_yled.container(
                 key="radius-preview",
             ):
+                base_radius_val = st.session_state[
+                    f"{preview_selector_prefix}-baseRadius"
+                ][0]
+                base_radius_unit = st.session_state[
+                    f"{preview_selector_prefix}-baseRadius"
+                ][1]
 
-                base_radius_val = st.session_state[f'{preview_selector_prefix}-baseRadius'][0]
-                base_radius_unit = st.session_state[f'{preview_selector_prefix}-baseRadius'][1]
-                
                 css = f"""
                 .st-key-radius-preview-base {{
                     border-radius: {base_radius_val}{base_radius_unit};
@@ -696,12 +875,20 @@ with st.container(key="theme-main-container"):
                 with st_yled.container(
                     key="radius-preview-base",
                     height=68,
-                    background_color=st.session_state[f'{preview_selector_prefix}-primaryColor'],
+                    background_color=st.session_state[
+                        f"{preview_selector_prefix}-primaryColor"
+                    ],
                 ):
-                    st_yled.markdown("**Base Radius**", color='#FFFFFF', width='content')
+                    st_yled.markdown(
+                        "**Base Radius**", color="#FFFFFF", width="content"
+                    )
 
-                button_radius_val = st.session_state[f'{preview_selector_prefix}-buttonRadius'][0]
-                button_radius_unit = st.session_state[f'{preview_selector_prefix}-buttonRadius'][1]
+                button_radius_val = st.session_state[
+                    f"{preview_selector_prefix}-buttonRadius"
+                ][0]
+                button_radius_unit = st.session_state[
+                    f"{preview_selector_prefix}-buttonRadius"
+                ][1]
 
                 css = f"""
                 .st-key-radius-preview-button button {{
@@ -712,6 +899,5 @@ with st.container(key="theme-main-container"):
                 st.html(f"<style>{css}</style>")
 
                 st_yled.button(
-                    "Button Radius",
-                    key="radius-preview-button",
-                    type="primary")
+                    "Button Radius", key="radius-preview-button", type="primary"
+                )

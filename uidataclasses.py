@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Dict
 
-class StyledComponent(BaseModel):
 
+class StyledComponent(BaseModel):
     name: str
     preview_description: str
     description: str
@@ -14,4 +14,3 @@ class StyledComponent(BaseModel):
     main_image_url: str
     code_examples: List[Dict]
     code_copy_template: str
-
