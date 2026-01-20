@@ -3,9 +3,9 @@ import uuid
 import re
 
 import streamlit as st
-from streamlit_split_button import split_button
 
 import st_yled
+from st_yled import split_button
 
 import uiconfig
 import utils
@@ -141,13 +141,13 @@ def get_element_styles_to_python(element_name: str, element_key_base: str, type_
 
 
 
-def elements_color_picker(elements_key: str,
+def elements_color_picker(key: str,
                         label: str,
                         label_font_size: str = '20px',
                         label_field_width: int = 130):
 
-    if elements_key in st.session_state:
-        color_state_value = st.session_state[elements_key]
+    if key in st.session_state:
+        color_state_value = st.session_state[key]
         code_color = None
     else:
         color_state_value = "default"
@@ -159,7 +159,7 @@ def elements_color_picker(elements_key: str,
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     utils.base_color_picker(
-        key=elements_key,
+        key=key,
         seed_value=st.session_state[input_seed_key],
         label=label,
         label_font_size=label_font_size,
@@ -550,7 +550,7 @@ with st.container(key="elements-main-container"):
                     key=st.session_state['element-card-split-' + element_hash],
                     options=["Remove", "Reset"]
                 )
-            
+
                 if res == "Remove":
                     # Make sure to delete variants if any
                     remove_element_from_selection(element_hash,element_key_base,element_name)
