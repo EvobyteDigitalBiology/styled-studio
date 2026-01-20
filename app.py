@@ -222,18 +222,23 @@ def render_export_elements():
     # Provide option to download css file OR copy code
 
     export_elements = {}
+    excluded_elements_message = ""
 
     for key in st.session_state:
 
         if key.startswith("element-") and key.endswith("-value"):            
-            key_parse = key.replace("-value", "").replace("element-", "")
-            css_prop_format = key_parse.split("-")[-1]
-            element_name = "_".join(key_parse.split("-")[:-1])
+            
+            css_prop_format = key.split("-")[-2]
+            element_name = key.split("-")[1]
 
             if element_name not in uiconfig.ELEMENTS_EXCLUDED_FROM_CSS:
                 if element_name not in export_elements:
                     export_elements[element_name] = {}
                 export_elements[element_name][css_prop_format] = st.session_state[key]
+            else:
+                excluded_elements_message = f"Some elements are excluded from CSS export, e.g., {element_name}. Use \"Copy Python\" in the element editor instead."
+
+
 
     # Get CSS for element
     export_css = {}
@@ -300,7 +305,12 @@ def render_export_elements():
                 st.markdown("Copy and add/replace sections in your `st-styled.css` file")
                     
                 st.code(export_css_format)
-                
+
+        if excluded_elements_message != "":
+            st_yled.markdown(f":material/notification_important: {excluded_elements_message}",
+                             key="export-elements-excluded-elements-note",
+                             font_size="14px",
+                             color="#31333F99")  
 
         bgroup_cont = st.container(key="export-elements-button-group-container", horizontal=True)
 
@@ -325,15 +335,8 @@ def render_export_components():
     """)
 
     st.write("")
-    st.markdown("**Example: Perform a page redirect**")
-    
-    st_yled.code("""
-if st_yled.button("Go to Streamlit website"):
-    st_yled.redirect("https://streamlit.io")""")
-
-    st.write("")
     st.markdown("**Example: Card Component**")
-    
+
     st_yled.code("""
 st_yled.badge_card_one(
     badge_text="New",
@@ -341,7 +344,14 @@ st_yled.badge_card_one(
     title="Badge Card",
     text="A card with a badge")
 """)
+
+    st.write("")
+    st.markdown("**Example: Perform a page redirect**")
     
+    st_yled.code("""
+if st_yled.button("Go to Streamlit website"):
+    st_yled.redirect("https://streamlit.io")""")
+
     if st.button("Close", type='secondary', width=90):
         st.rerun()
 
@@ -640,7 +650,7 @@ with st.sidebar.container(key="sidebar-footer-container"):
 
         st.image("assets/logo_small.svg", width=80)
 
-        st_yled.markdown("""**styled studio**\n\nwith :heart: from [EVOBYTE](https://evo-byte.com)\n(c)2025""",
+        st_yled.markdown("""**styled studio**\n\nwith :heart: from [EVOBYTE](https://evo-byte.com)\n(c)2025-2026""",
                         font_size="14px",
                         color='#31333F99',
                         key="sidebar-footer-logo-side",
