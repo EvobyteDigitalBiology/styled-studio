@@ -28,10 +28,6 @@ def revert_category_slugs():
     """Return a dictionary that maps slugs back to category names"""
     return {slug: category for category, slug in CATEGORY_SLUGS.items()}
 
-    # Create reverse mapping from slug to category name
-    return {slug: category for category, slug in category_slugs.items()}
-
-
 def segmented_control_toggle(
     option1: str, option2: str, key: str, index: int = 0
 ) -> str:
@@ -71,7 +67,7 @@ def segmented_control_toggle(
 
     st.html(f"<style>{css}</style>")
 
-    seg_control_select = st_yled.radio(
+    return st_yled.radio(
         "Frame Type",
         options=[option1, option2],
         key=key,
@@ -80,8 +76,6 @@ def segmented_control_toggle(
         font_size="14px",
         index=index,
     )
-    return seg_control_select
-
 
 def update_st_from_input(theme_property: str, input_selector_key: str):
     # Reset if input selector is none
@@ -165,7 +159,7 @@ def base_color_picker(
         else:
             display_color = None
 
-        color_picker = st.color_picker(
+        st.color_picker(
             f"Pick {label}",
             value=display_color,
             key=key + "-picker-" + seed_value,
@@ -211,10 +205,10 @@ def base_size_input(
         )
 
         index_select = allowed_units.index(unit)
-        unit_disabled = True if len(allowed_units) == 1 else False
+        unit_disabled = len(allowed_units) == 1
 
         # Unit selectbox
-        unit_value = st.selectbox(
+        st.selectbox(
             f"Set {label} unit",
             options=allowed_units,
             index=index_select,
@@ -229,8 +223,6 @@ def base_size_input(
 
 def load_components() -> Dict[str, StyledComponent]:
     components = st_yled.constants.COMPONENTS
-    components = {
+    return {
         slug: StyledComponent(**component) for slug, component in components.items()
     }
-
-    return components

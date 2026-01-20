@@ -178,7 +178,7 @@ def elements_selectbox(
     with st.container(horizontal=True, vertical_alignment="center"):
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
-        selected_option = st_yled.selectbox(
+        st_yled.selectbox(
             "Select an option",
             options=options,
             format_func=format_func,

@@ -290,7 +290,7 @@ def theme_weight_input(
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
         # Number input
-        number_value = st.number_input(
+        st.number_input(
             f"Set {label} value",
             value=current_value,
             min_value=100,
