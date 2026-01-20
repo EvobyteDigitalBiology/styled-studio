@@ -610,7 +610,7 @@ def render_feedback_dialog():
     st_yled.init()
 
     # Which features, functions or components are missing?
-    feedback_cont = st.container(key="feedback-dialog-container")
+    st.container(key="feedback-dialog-container")
 
     with st_yled.container(
         key="feedback-dialog-intro-container",
@@ -782,7 +782,6 @@ with sticky_header:
         vertical_alignment="center",
         width=250,
     ):
-        # st.image("assets/st_yled Logo.png", width=40)
         st_yled.title(
             "st_yled studio", font_size="26px", key="header-title", color="#97A6C3"
         )
