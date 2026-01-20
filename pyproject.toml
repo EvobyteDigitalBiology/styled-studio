@@ -1,6 +1,6 @@
 [project]
 name = "styled-studio"
-version = "0.2.1"
+version = "0.3.0"
 description = "Advanced styling and custom components for Streamlit applications"
 authors = [
     {name = "JonathanAlles", email = "Jonathan.Alles@evo-byte.com"}
@@ -27,10 +27,10 @@ dependencies = [
     "streamlit>=1.52.0",  # Add Streamlit peer dependency (minimum version 1.42)
     "pandas>=2.0.0,<3.0.0",
     "openpyxl>=3.1.5,<4.0.0",
-    "st-styled>=0.2.1",
-    "streamlit-split-button (>=0.1.0,<0.2.0)",
     "boto3 (>=1.42.4,<2.0.0)",
     "dotenv (>=0.9.9,<0.10.0)",
+    "pydantic (>=2.12.5,<3.0.0)",
+    "st-styled>=0.3.0"
 ]
 
 [project.optional-dependencies]
