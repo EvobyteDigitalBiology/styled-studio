@@ -144,7 +144,7 @@ def base_color_picker(key: str,
                 font_size='14px',
                 color=code_color,
                 width=124,
-                key=key + "-code"
+                key=key + "-code-" + seed_value
             )
 
         if color_state_value.startswith('#') and len(color_state_value) == 9:
