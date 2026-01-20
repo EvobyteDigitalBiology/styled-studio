@@ -1,72 +1,77 @@
-
 import uuid
 import re
+from typing import Optional
 
 import streamlit as st
-from streamlit_split_button import split_button
 
 import st_yled
+from st_yled import split_button
 
 import uiconfig
 import utils
 
 st_yled.init()
 
+
 def add_element_to_selection(element_name: str):
-    
-    if element_name in st.session_state['element-select-names']:
+    if element_name in st.session_state["element-select-names"]:
         return
 
-    if 'element-select' not in st.session_state:
-        st.session_state['element-select'] = dict()
+    if "element-select" not in st.session_state:
+        st.session_state["element-select"] = dict()
 
     element_hash = str(uuid.uuid4())
 
     # Get styling options for this element
     variants = st_yled.styler.get_element_variants(element_name)
-    
-    element_entry = {
-        'name': element_name,
-        'types': dict()
-    }
+
+    element_entry = {"name": element_name, "types": dict()}
 
     if len(variants) == 0:
-        variants = ['default']
-    
+        variants = ["default"]
+
     # Combine variants into the element entry
     for variant in variants:
-        
-        if variant == 'default':
+        if variant == "default":
             element_config = st_yled.styler.get_element_style(element_name)
         else:
-            element_config = st_yled.styler.get_element_style(element_name + '_' + variant)
+            element_config = st_yled.styler.get_element_style(
+                element_name + "_" + variant
+            )
 
         element_config = element_config.copy()
         # Strip element config to css[element]
         element_css = dict()
-        for css_prop in list(element_config['css'].keys()):
+        for css_prop in list(element_config["css"].keys()):
             element_css[css_prop] = None
-        element_config['css'] = element_css
+        element_config["css"] = element_css
 
-        element_entry['types'][variant] = element_config
-    
-    st.session_state['element-select'][element_hash] = element_entry
-    st.session_state['element-select-names'].append(element_name)
+        element_entry["types"][variant] = element_config
+
+    st.session_state["element-select"][element_hash] = element_entry
+    st.session_state["element-select-names"].append(element_name)
 
 
-def remove_element_from_selection(element_hash: str,
-                                element_key_base: str,
-                                element_name: str):
-
-    element_name_prefix = 'element-' + element_name
+def remove_element_from_selection(
+    element_hash: str, element_key_base: str, element_name: str
+):
+    element_name_prefix = "element-" + element_name
 
     # Remove from selection and available elements for selection
-    del st.session_state['element-select'][element_hash]
-    st.session_state['element-select-names'].remove(element_name)
+    del st.session_state["element-select"][element_hash]
+    st.session_state["element-select-names"].remove(element_name)
 
     # Remove all associated session state keys
-    keys_to_remove = [key for key in st.session_state.keys() if key.startswith(element_name_prefix) and key.endswith("-value")]
-    input_seed_keys_to_remove = [key for key in st.session_state.keys() if key.startswith(element_name_prefix) and key.endswith("-value-seed")]
+    keys_to_remove = [
+        key
+        for key in st.session_state.keys()
+        if key.startswith(element_name_prefix) and key.endswith("-value")
+    ]
+    input_seed_keys_to_remove = [
+        key
+        for key in st.session_state.keys()
+        if key.startswith(element_name_prefix) and key.endswith("-value-seed")
+    ]
 
     for key in keys_to_remove:
         del st.session_state[key]
@@ -76,59 +81,47 @@ def remove_element_from_selection(element_hash: str,
 
 
 def reset_element_styles(element_key_base: str):
-
     # Remove all associated session state keys
-    value_keys_to_remove = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value")]
-    input_seed_keys_to_remove = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value-seed")]
+    value_keys_to_remove = [
+        key
+        for key in st.session_state.keys()
+        if key.startswith(element_key_base) and key.endswith("-value")
+    ]
+    input_seed_keys_to_remove = [
+        key
+        for key in st.session_state.keys()
+        if key.startswith(element_key_base) and key.endswith("-value-seed")
+    ]
 
     for key in value_keys_to_remove:
         del st.session_state[key]
-    
+
     for key in input_seed_keys_to_remove:
         del st.session_state[key]
 
 
-# def copy_element_styles_to_clipboard(element_name: str, element_key_base: str):
-    
-#     # Get values for all associated session state keys
-#     keys_to_copy = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value")]
-
-#     # Extract properrties from keys
-#     all_args = []
-#     for key in keys_to_copy:
-#         key_parse = key.replace("-value", "").replace("element-", "")
-#         css_prop_format = key_parse.split("-")[-1]
-#         value = st.session_state[key]
-#         arg_str = f"{css_prop_format}=\"{value}\""
-#         all_args.append(arg_str)
-#     all_args_str = ", ".join(all_args)
-
-#     if all_args_str:
-#         python_cmd = f"st_yled.{element_name}(*, {all_args_str})"
-#     else:
-#         python_cmd = f"st_yled.{element_name}(*)"
-
-#     pyperclip.copy(python_cmd)
-#     st.toast("Element Python copied to clipboard", icon=":material/content_copy:")
-
-
-def get_element_styles_to_python(element_name: str, element_key_base: str, type_select: str = None) -> str:
-    
+def get_element_styles_to_python(
+    element_name: str, element_key_base: str, type_select: Optional[str] = None
+) -> str:
     # Get values for all associated session state keys
-    keys_to_copy = [key for key in st.session_state.keys() if key.startswith(element_key_base) and key.endswith("-value")]
+    keys_to_copy = [
+        key
+        for key in st.session_state.keys()
+        if key.startswith(element_key_base) and key.endswith("-value")
+    ]
 
     # Extract properties from keys
     all_args = []
     for key in keys_to_copy:
-        key_parse = key.replace("-value", "").replace("element-", "")
-        css_prop_format = key_parse.split("-")[-1]
+        assert key.endswith("-value") and key.startswith("element-")
+        css_prop_format = key.split("-")[-2]
         value = st.session_state[key]
-        arg_str = f"{css_prop_format}=\"{value}\""
+        arg_str = f'{css_prop_format}="{value}"'
         all_args.append(arg_str)
     all_args_str = ", ".join(all_args)
 
     if type_select:
-        type_args_str = f", type=\"{type_select}\""
+        type_args_str = f', type="{type_select}"'
     else:
         type_args_str = ""
 
@@ -140,14 +133,11 @@ def get_element_styles_to_python(element_name: str, element_key_base: str, type_
     return python_cmd
 
 
-
-def elements_color_picker(elements_key: str,
-                        label: str,
-                        label_font_size: str = '20px',
-                        label_field_width: int = 130):
-
-    if elements_key in st.session_state:
-        color_state_value = st.session_state[elements_key]
+def elements_color_picker(
+    key: str, label: str, label_font_size: str = "20px", label_field_width: int = 130
+):
+    if key in st.session_state:
+        color_state_value = st.session_state[key]
         code_color = None
     else:
         color_state_value = "default"
@@ -155,39 +145,40 @@ def elements_color_picker(elements_key: str,
 
     input_seed_key = key + "-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     utils.base_color_picker(
-        key=elements_key,
+        key=key,
         seed_value=st.session_state[input_seed_key],
         label=label,
         label_font_size=label_font_size,
         label_field_width=label_field_width,
         color_state_value=color_state_value,
         code_color=code_color,
-        caption_width=80
+        caption_width=80,
     )
 
-def elements_selectbox(key: str,
-                        label: str,
-                        options: list[str],
-                        label_font_size: str = '16px',
-                        label_field_width: int = 130,
-                        format_func = lambda x: x):
 
+def elements_selectbox(
+    key: str,
+    label: str,
+    options: list[str],
+    label_font_size: str = "16px",
+    label_field_width: int = 130,
+    format_func=lambda x: x,
+):
     input_seed_key = key + "-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     seed_value = st.session_state[input_seed_key]
 
     with st.container(horizontal=True, vertical_alignment="center"):
-
         st_yled.markdown(label, font_size=label_font_size, width=label_field_width)
 
-        selected_option = st_yled.selectbox(
+        st_yled.selectbox(
             "Select an option",
             options=options,
             format_func=format_func,
@@ -195,43 +186,44 @@ def elements_selectbox(key: str,
             key=key + "-selectbox-" + seed_value,
             label_visibility="collapsed",
             on_change=utils.update_st_from_input,
-            placeholder = "default",
+            placeholder="default",
             args=(key, key + "-selectbox-" + seed_value),
-            width = 160
+            width=160,
         )
 
         st_yled.caption("Select Option", width=80)
 
 
-def elements_size_input(key,
-                        label: str,
-                        allowed_units: list[str],
-                        unit_step_sizes: list[float],
-                        label_font_size: str = '16px',
-                        label_field_width: int = 130):
-
+def elements_size_input(
+    key,
+    label: str,
+    allowed_units: list[str],
+    unit_step_sizes: list[float],
+    label_font_size: str = "16px",
+    label_field_width: int = 130,
+):
     if key in st.session_state:
         size_state_value = st.session_state[key]
 
         if size_state_value.startswith("None"):
             size_state_value = size_state_value.replace("None", "")
-        
+
         # None found
-        current_number = re.findall(r'\d+\.?\d*', size_state_value)
+        current_number = re.findall(r"\d+\.?\d*", size_state_value)
         if current_number:
             current_number = float(current_number[0])
         else:
             current_number = None
-        
+
         # Filter out potentila None values
-        current_unit = re.findall(r'[a-zA-Z]+', size_state_value)[0]
+        current_unit = re.findall(r"[a-zA-Z]+", size_state_value)[0]
     else:
         current_number = None
         current_unit = allowed_units[0]
 
     input_seed_key = key + "-seed"
 
-    if not input_seed_key in st.session_state:
+    if input_seed_key not in st.session_state:
         st.session_state[input_seed_key] = str(uuid.uuid4())
 
     step_size = unit_step_sizes[allowed_units.index(current_unit)]
@@ -247,14 +239,23 @@ def elements_size_input(key,
         allowed_units=allowed_units,
         label_font_size=label_font_size,
         label_field_width=label_field_width,
-        return_value_type='str'
+        return_value_type="str",
     )
 
 
 def weight_display_func(option):
-
     options = ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
-    display_options = ["thin", "extra-light", "light", "normal", "medium", "semi-bold", "bold", "extra-bold", "black"]
+    display_options = [
+        "thin",
+        "extra-light",
+        "light",
+        "normal",
+        "medium",
+        "semi-bold",
+        "bold",
+        "extra-bold",
+        "black",
+    ]
 
     if option is None:
         return None
@@ -263,43 +264,55 @@ def weight_display_func(option):
 
 
 def get_input_widget_for_property(prop: str, key: str, display_name: str):
-
     widget_type = uiconfig.css_properties_input_widget[prop]
-    
-    if widget_type == 'color_picker':
-        elements_color_picker(key, display_name, label_font_size='16px')
-    
-    elif widget_type == 'size_input':
-        allowed_units = ['px', 'em', 'rem']
+
+    if widget_type == "color_picker":
+        elements_color_picker(key, display_name, label_font_size="16px")
+
+    elif widget_type == "size_input":
+        allowed_units = ["px", "em", "rem"]
         unit_step_sizes = [1.0, 0.1, 0.1]
         elements_size_input(
-            key,
-            display_name,
-            allowed_units,
-            unit_step_sizes,
-            label_font_size='16px'
+            key, display_name, allowed_units, unit_step_sizes, label_font_size="16px"
         )
-    
-    elif widget_type == 'selectbox':
-        if prop == 'border_style':
-            options = ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset', 'hidden']
-            elements_selectbox(key, display_name, options, label_font_size='16px')
-        elif prop == 'font_weight':
+
+    elif widget_type == "selectbox":
+        if prop == "border_style":
+            options = [
+                "none",
+                "solid",
+                "dashed",
+                "dotted",
+                "double",
+                "groove",
+                "ridge",
+                "inset",
+                "outset",
+                "hidden",
+            ]
+            elements_selectbox(key, display_name, options, label_font_size="16px")
+        elif prop.endswith("font_weight"):
             options = ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
 
-            elements_selectbox(key, display_name, options, format_func=lambda x: weight_display_func(x), label_font_size='16px')
+            elements_selectbox(
+                key,
+                display_name,
+                options,
+                format_func=lambda x: weight_display_func(x),
+                label_font_size="16px",
+            )
     else:
         pass
 
 
 # region data
 
-if 'element-select' not in st.session_state:
-    st.session_state['element-select'] = dict()
-if 'element-select-names' not in st.session_state:
-    st.session_state['element-select-names'] = list()
-if 'element-first-open' not in st.session_state:
-    st.session_state['element-first-open'] = True
+if "element-select" not in st.session_state:
+    st.session_state["element-select"] = dict()
+if "element-select-names" not in st.session_state:
+    st.session_state["element-select-names"] = list()
+if "element-first-open" not in st.session_state:
+    st.session_state["element-first-open"] = True
 
 # TODO Add default
 
@@ -317,29 +330,30 @@ category_display_options = [category_slug_display_map[cat] for cat in category_o
 
 # Add button as a default example for styling
 
-if st.session_state['element-first-open']:
+if st.session_state["element-first-open"]:
     add_element_to_selection("button")
-    st.session_state['element-first-open'] = False
+    st.session_state["element-first-open"] = False
+
 
 # region UI
 
 with st.container(key="elements-main-container"):
+    st.markdown("**> Elements** Style and customize your Streamlit UI elements")
 
-    st.markdown("**> Elements** Style and customize individual Streamlit UI elements")
-
-    with st_yled.popover('Style element',
-                        icon=":material/style:",
-                        background_color="#ff4b4b",
-                        color="#ffffff",
-                        key="elements-add-element-popover"):
-
+    # Window to add new element styles
+    with st_yled.popover(
+        "Style element",
+        icon=":material/style:",
+        background_color="#ff4b4b",
+        color="#ffffff",
+        key="elements-add-element-popover",
+    ):
         cont = st.container(width=600)
 
-        col1, col2 = cont.columns([4,3])
+        col1, col2 = cont.columns([4, 3])
 
         with col1:
-
-            col1_cat, col2_cat = col1.columns([1,2])
+            col1_cat, col2_cat = col1.columns([1, 2])
 
             with col1_cat:
                 # Returns display names for categories
@@ -349,11 +363,12 @@ with st.container(key="elements-main-container"):
                     key="elements-category-select",
                 )
 
+            # Get all elements belonging to a category
             category_select = category_display_slug_map[category_select_display]
             cat_elements = element_categories[category_select]
 
             # Remove cat_elements already in selection
-            selected_elements = st.session_state['element-select-names']
+            selected_elements = st.session_state["element-select-names"]
             cat_elements = [el for el in cat_elements if el not in selected_elements]
 
             with col2_cat:
@@ -365,76 +380,87 @@ with st.container(key="elements-main-container"):
                 )
 
         with col2:
-
             if element_select:
-
                 # Top Button Controls for Adding Element Styles
-                with st.container(key = "elements-add-element-selection-container"):
-
+                with st.container(key="elements-add-element-selection-container"):
                     st_yled.button(
                         "Add to editor pane",
                         key="elements-add-element-selection",
                         icon=":material/add_box:",
                         type="primary",
                         on_click=add_element_to_selection,
-                        args=(element_select,)
+                        args=(element_select,),
                     )
 
-                    with st_yled.container(key = "elements-add-element-preview-container", background_color="#F6F6F6"):
-
+                    with st_yled.container(
+                        key="elements-add-element-preview-container",
+                        background_color="#F6F6F6",
+                        padding="16px",
+                    ):
                         st_yled.subheader(element_select, font_size=24)
 
-                        element_config = st_yled.styler.get_element_style(element_select)
+                        element_config = st_yled.styler.get_element_style(
+                            element_select
+                        )
 
-                        if 'example' in element_config:
-                            kwargs = {'key': f'preview-example-{element_select}'}
-                            eval(element_config['example'])
+                        # Preview example if example code is available
+                        if "example" in element_config:
+                            kwargs = {"key": f"preview-example-{element_select}"}
+                            eval(element_config["example"])
                         else:
                             st_yled.info("No preview available", icon=":material/info:")
 
-
-    elements_display = st.session_state['element-select']
+    # Get all selected elements to render as cards in main UI
+    elements_display = st.session_state["element-select"]
     display_keys = list(elements_display.keys())[::-1]  # Reverse order for display
 
-
-# region Render Cards
+    # region Render Cards
 
     for ix, element_hash in enumerate(display_keys):
-
+        # Extract features like element name and types (e.g., primary, secondary)
         element_card_props = elements_display[element_hash]
-        element_types = list(element_card_props['types'].keys())
-        element_name = element_card_props['name']
+        element_types = list(element_card_props["types"].keys())
+        element_name = element_card_props["name"]
 
         # Define a random key for the element card split button
-        if 'element-card-split-' + element_hash not in st.session_state:
-            st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
-        
-        # Check if multiple types
+        if "element-card-split-" + element_hash not in st.session_state:
+            st.session_state["element-card-split-" + element_hash] = str(uuid.uuid4())
+
+        # Check if multiple types like primary, secondary are defined for this element
+        # Source is in the element_card_props
         if len(element_types) == 1:
             type_selector = False
             type_select = element_types[0]
         else:
             type_selector = True
-            if 'secondary' in element_types:
-                type_select = 'secondary'
+            if "secondary" in element_types:
+                type_select = "secondary"
             else:
                 type_select = element_types[0]
 
         # Get available css properties for this element type
-        css_props = list(element_card_props['types'][type_select]['css'].keys())
+        # Each css property is associated with a tab
+        css_props = list(element_card_props["types"][type_select]["css"].keys())
         css_tabs = {uiconfig.css_properties_tabs[prop] for prop in css_props}
 
         tabs_render = []
-        if 'Color' in css_tabs:
-            tabs_render.append('Color')
-        if 'Font' in css_tabs:
-            tabs_render.append('Font')
-        if 'Border' in css_tabs:
-            tabs_render.append('Border')
+        if "Color" in css_tabs:
+            tabs_render.append("Color")
+        if "Font" in css_tabs:
+            tabs_render.append("Font")
+        if "Border" in css_tabs:
+            tabs_render.append("Border")
+        if "Padding" in css_tabs:
+            tabs_render.append("Padding")
+        if "Label" in css_tabs:
+            tabs_render.append("Label")
+        if "Value" in css_tabs:
+            tabs_render.append("Value")
 
-        with st_yled.container(background_color='#F6F6F6',
-                                key=f"element-card-container-{element_hash}"):
-            
+        # Create element card
+        with st_yled.container(
+            background_color="#F6F6F6", key=f"element-card-container-{element_hash}"
+        ):
             # Apply card css
             css = f"""
                 .st-key-element-card-container-{element_hash} {{
@@ -472,11 +498,13 @@ with st.container(key="elements-main-container"):
                 """
             st.html(f"<style>{css}</style>")
 
-            col1, col2 = st.columns([1,2], gap="medium")
+            col1, col2 = st.columns([1, 2], gap="medium")
 
             with col1:
-                
                 st_yled.subheader(element_name, font_size=24)
+
+                # type_select is defined in the beginning of the card
+                # type_select
 
                 # Check if multiple types
                 if type_selector:
@@ -487,87 +515,109 @@ with st.container(key="elements-main-container"):
                         key=f"element-{element_hash}-type-select",
                         format_func=lambda x: uiconfig.element_type_format.get(x),
                         label_visibility="collapsed",
-                        font_size='14px',
-                        width=180
+                        font_size="14px",
+                        width=180,
                     )
                 else:
                     st.write("")
 
-                element_key_base = 'element-' + element_name
+                # Define a name base for the element keys
+                element_key_base = "element-" + element_name
                 if type_selector:
                     element_key_base = element_key_base + "-" + type_select
-                
+
                 # Create example container
-                with st_yled.container(horizontal_alignment="center",
-                                        key=f"element-{element_hash}-example-container",
-                                        background_color="#FFFFFF"):
-                    
+                with st_yled.container(
+                    horizontal_alignment="center",
+                    key=f"element-{element_hash}-example-container",
+                    background_color="#FFFFFF",
+                ):
                     kwargs = {}
                     # Extract all css properties for this element type
+                    # Get the values from session state if defined to be rendered in example page
                     for key in st.session_state.keys():
                         if key.startswith(element_key_base) and key.endswith("-value"):
-                            css_prop = key.replace(element_key_base + '-', "").replace('-value', "")
+                            css_prop = key.split("-")[-2]
                             css_value = st.session_state[key]
                             kwargs[css_prop] = css_value
-                    
+
+                    # Add cases where example should be defined custom, like for containers
+                    if element_name == "container":
+                        with st_yled.container(**kwargs):
+                            st.write("Container Content")
+
+                    elif element_name == "expander":
+                        with st_yled.expander(
+                            "Expander Title", **kwargs, expanded=True
+                        ):
+                            st.write("Expander Content")
+
                     # Create example to displa changes
-                    if 'example' in element_card_props['types'][type_select]:
-                        eval(element_card_props['types'][type_select]['example'])
+                    elif "example" in element_card_props["types"][type_select]:
+                        eval(element_card_props["types"][type_select]["example"])
 
                 res = split_button(
-                    label = "Copy Python",
-                    key=st.session_state['element-card-split-' + element_hash],
-                    options=["Remove", "Reset"]
+                    label="Copy Python",
+                    key=st.session_state["element-card-split-" + element_hash],
+                    options=["Remove", "Reset"],
                 )
-            
-                if res == "Remove":
 
+                if res == "Remove":
                     # Make sure to delete variants if any
-                    remove_element_from_selection(element_hash,element_key_base,element_name)
-                    
+                    remove_element_from_selection(
+                        element_hash, element_key_base, element_name
+                    )
+
                     # Required to render new key for split button on action and reset state
-                    st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
+                    st.session_state["element-card-split-" + element_hash] = str(
+                        uuid.uuid4()
+                    )
                     st.rerun()
-                
+
                 elif res == "Reset":
                     reset_element_styles(element_key_base)
                     # Required to render new key for split button on action and reset state
-                    st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
+                    st.session_state["element-card-split-" + element_hash] = str(
+                        uuid.uuid4()
+                    )
 
                     # Delete all input seed keys associated with this element
-                    #input_seed_keys_to_remove = [key for key in st.session_state.keys() if key
+                    # input_seed_keys_to_remove = [key for key in st.session_state.keys() if key
 
                     st.rerun()
 
             with col2:
-
                 tabs = st.tabs(tabs_render)
-                
+
                 for ix, tab in enumerate(tabs):
-
                     with tab:
-
                         for prop in css_props:
                             if uiconfig.css_properties_tabs[prop] == tabs_render[ix]:
-                                display_name = uiconfig.css_properties_display_name.get(prop, prop)
+                                display_name = uiconfig.css_properties_display_name.get(
+                                    prop, prop
+                                )
 
                                 element_key = element_key_base + f"-{prop}-value"
-                                get_input_widget_for_property(prop, element_key, display_name)
+                                get_input_widget_for_property(
+                                    prop, element_key, display_name
+                                )
 
                                 # Get the right display function and def
 
-
             # Final bottom
             if res == "Copy Python":
-                
                 if type_selector:
                     type_select_arg = type_select
                 else:
                     type_select_arg = None
 
-                python_cmd = get_element_styles_to_python(element_name, element_key_base, type_select_arg)
+                python_cmd = get_element_styles_to_python(
+                    element_name, element_key_base, type_select_arg
+                )
 
                 st_yled.code(python_cmd, background_color="#FFFFFF", language="python")
 
                 # Required to render new key for split button on action and reset state
-                st.session_state['element-card-split-' + element_hash] = str(uuid.uuid4())
+                st.session_state["element-card-split-" + element_hash] = str(
+                    uuid.uuid4()
+                )

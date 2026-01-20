@@ -1,7 +1,7 @@
-streamlit>=1.42.0
+streamlit>=1.53.0
 pandas>=2.0.0,<3.0.0
 openpyxl>=3.1.5,<4.0.0
-st-styled
-streamlit-split-button>=0.1.0,<0.2.0
+st-styled>=0.3.0
 boto3>=1.28.0,<2.0.0
 dotenv
+pydantic
