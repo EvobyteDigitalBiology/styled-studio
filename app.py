@@ -700,7 +700,7 @@ pg = st.navigation([theme_page, element_page, components_page, components_detail
 
 st.set_page_config(page_title="st_yled studio", page_icon="assets/st_yled Logo.png")
 
-st.logo("assets/st_yled_logo_corer.svg", size="large")
+st.logo("assets/st_yled Logo.png", size="large")
 
 if "feedback-submitted" in st.session_state:
     if st.session_state["feedback-submitted"]:
@@ -743,19 +743,20 @@ with st.sidebar.container(key="sidebar-footer-container"):
 
     with st.container(
         key="sidebar-footer-letter-container",
-        horizontal=True,
+        horizontal=False,
         vertical_alignment="center",
         gap="medium",
     ):
-        st.image("assets/logo_small.svg", width=80)
-
+        
         st_yled.markdown(
-            """**styled studio**\n\nwith :heart: from [EVOBYTE](https://evo-byte.com)\n(c)2025-2026""",
+            """**styled studio**\n(c)2025-2026\n""",
             font_size="14px",
             color="#31333F99",
             key="sidebar-footer-logo-side",
             width=80,
         )
+
+        st.image("https://evo-byte.com/wp-content/uploads/2026/04/EVOBYTE-Data-Science-scaled.webp", width=136, link="https://evo-byte.com/")
 
 
 # region HEADER
