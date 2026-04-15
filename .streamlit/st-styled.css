@@ -8,7 +8,11 @@
 }
 
 div[data-testid="stSidebarContent"] {
-    padding: 2rem;
+    padding-top: 8px;
+    padding-right: 1rem;
+    padding-bottom: 2rem;
+    padding-left: 2rem;
+
 }
 /* 
 div[data-testid="stSidebarHeader"] img {
@@ -18,6 +22,11 @@ div[data-testid="stSidebarHeader"] img {
 
 div[data-testid="stSidebarHeader"] {
     margin-bottom: 2rem;
+}
+
+div[data-testid="stSidebarHeader"] img {
+    height: 3rem;
+    align-items:start;
 }
 
 div[data-testid="stSidebarNavSeparator"] {
@@ -36,7 +45,7 @@ div[data-testid="stSidebarNavLinkContainer"] span {
     position: absolute;
     bottom: 0;
     margin-bottom: 2rem;
-    width: auto;
+    width: 75%;
 }
 
 .st-key-sidebar-footer-container a {
