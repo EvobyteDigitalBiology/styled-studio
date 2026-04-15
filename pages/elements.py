@@ -10,7 +10,9 @@ from st_yled import split_button
 import uiconfig
 import utils
 
-st_yled.init()
+st_yled.init(
+    bypass_css_validation = True
+)
 
 
 def add_element_to_selection(element_name: str):
@@ -50,6 +52,7 @@ def add_element_to_selection(element_name: str):
 
     st.session_state["element-select"][element_hash] = element_entry
     st.session_state["element-select-names"].append(element_name)
+
 
 
 def remove_element_from_selection(
@@ -551,6 +554,12 @@ with st.container(key="elements-main-container"):
                             "Expander Title", **kwargs, expanded=True
                         ):
                             st.write("Expander Content")
+                    
+                    elif element_name == "popover":
+                        with st_yled.popover(
+                            "Popover Title", **kwargs, key=f"example-popover-{element_hash}"
+                        ):
+                            st.write("Popover Content")
 
                     # Create example to displa changes
                     elif "example" in element_card_props["types"][type_select]:
