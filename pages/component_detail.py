@@ -4,7 +4,9 @@ import st_yled
 import utils
 from uidataclasses import StyledComponent
 
-st_yled.init()
+st_yled.init(
+    bypass_css_validation = True
+)
 
 qparams = st.query_params
 components = utils.load_components()
@@ -65,10 +67,14 @@ def main(slug, select_component: StyledComponent):
         st.space(8)
 
         with st_yled.expander(
-            label="Code Examples", background_color="#F6F6F6", border_width="0px"
+            label="Code Examples", background_color="#F6F6F6", border_width="1px"
         ):
             for code_example in select_component.code_examples:
                 st.code(code_example["code"], language="python")
+
+            # TO Add
+            # else:
+            #     eval(code_example["code"])
 
     st.space(8)
 
