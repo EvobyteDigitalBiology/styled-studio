@@ -10,7 +10,9 @@ from st_yled import split_button
 import uiconfig
 import utils
 
-st_yled.init()
+st_yled.init(
+    bypass_css_validation = True
+)
 
 
 def add_element_to_selection(element_name: str):
@@ -50,6 +52,7 @@ def add_element_to_selection(element_name: str):
 
     st.session_state["element-select"][element_hash] = element_entry
     st.session_state["element-select-names"].append(element_name)
+
 
 
 def remove_element_from_selection(
@@ -348,9 +351,37 @@ with st.container(key="elements-main-container"):
         color="#ffffff",
         key="elements-add-element-popover",
     ):
+        selected_elements = st.session_state["element-select-names"]
+
+        # Provide a searchable list across all categories while keeping radio as fallback.
+        available_elements = sorted(
+            {
+                element
+                for category_items in element_categories.values()
+                for element in category_items
+                if element not in selected_elements
+            }
+        )
+
         cont = st.container(width=600)
 
+        with cont.container(key="elements-bottom-controls-container"):
+            controls_col1, controls_col2 = st.columns([4, 3], vertical_alignment="bottom")
+
+            with controls_col1:
+                element_search_select = st_yled.selectbox(
+                    "Search element",
+                    options=available_elements,
+                    index=None,
+                    key="elements-search-select",
+                    placeholder="Search elements",
+                )
+
+            add_button_slot = controls_col2.empty()
+
         col1, col2 = cont.columns([4, 3])
+
+        
 
         with col1:
             col1_cat, col2_cat = col1.columns([1, 2])
@@ -368,47 +399,53 @@ with st.container(key="elements-main-container"):
             cat_elements = element_categories[category_select]
 
             # Remove cat_elements already in selection
-            selected_elements = st.session_state["element-select-names"]
             cat_elements = [el for el in cat_elements if el not in selected_elements]
 
             with col2_cat:
-                element_select = st_yled.radio(
-                    "Element",
-                    options=cat_elements,
-                    index=0,
-                    key="elements-state-select",
+                if cat_elements:
+                    element_radio_select = st_yled.radio(
+                        "Element",
+                        options=cat_elements,
+                        index=0,
+                        key="elements-state-select",
+                    )
+                else:
+                    element_radio_select = None
+                    st_yled.caption("No elements left in this category")
+
+        element_select = element_search_select or element_radio_select
+
+        with add_button_slot:
+            if element_select:
+                st_yled.button(
+                    "Add to editor pane",
+                    key="elements-add-element-selection",
+                    icon=":material/add_box:",
+                    type="primary",
+                    on_click=add_element_to_selection,
+                    args=(element_select,),
                 )
 
         with col2:
             if element_select:
-                # Top Button Controls for Adding Element Styles
-                with st.container(key="elements-add-element-selection-container"):
-                    st_yled.button(
-                        "Add to editor pane",
-                        key="elements-add-element-selection",
-                        icon=":material/add_box:",
-                        type="primary",
-                        on_click=add_element_to_selection,
-                        args=(element_select,),
+                st.space(8)
+                with st_yled.container(
+                    key="elements-add-element-preview-container",
+                    background_color="#F6F6F6",
+                    padding="16px",
+                ):
+                    st_yled.subheader(element_select, font_size=24)
+
+                    element_config = st_yled.styler.get_element_style(
+                        element_select
                     )
 
-                    with st_yled.container(
-                        key="elements-add-element-preview-container",
-                        background_color="#F6F6F6",
-                        padding="16px",
-                    ):
-                        st_yled.subheader(element_select, font_size=24)
-
-                        element_config = st_yled.styler.get_element_style(
-                            element_select
-                        )
-
-                        # Preview example if example code is available
-                        if "example" in element_config:
-                            kwargs = {"key": f"preview-example-{element_select}"}
-                            eval(element_config["example"])
-                        else:
-                            st_yled.info("No preview available", icon=":material/info:")
+                    # Preview example if example code is available
+                    if "example" in element_config:
+                        kwargs = {"key": f"preview-example-{element_select}"}
+                        eval(element_config["example"])
+                    else:
+                        st_yled.info("No preview available", icon=":material/info:")
 
     # Get all selected elements to render as cards in main UI
     elements_display = st.session_state["element-select"]
@@ -551,6 +588,12 @@ with st.container(key="elements-main-container"):
                             "Expander Title", **kwargs, expanded=True
                         ):
                             st.write("Expander Content")
+                    
+                    elif element_name == "popover":
+                        with st_yled.popover(
+                            "Popover Title", **kwargs, key=f"example-popover-{element_hash}"
+                        ):
+                            st.write("Popover Content")
 
                     # Create example to displa changes
                     elif "example" in element_card_props["types"][type_select]:

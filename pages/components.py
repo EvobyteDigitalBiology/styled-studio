@@ -3,7 +3,9 @@ import st_yled
 
 import utils
 
-st_yled.init()
+st_yled.init(
+    bypass_css_validation = True
+)
 
 
 components = utils.load_components()
