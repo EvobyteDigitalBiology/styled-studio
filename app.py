@@ -145,7 +145,9 @@ def format_css_from_dict(css_dict: dict) -> str:
 
 
 def render_export_theme(config_toml_template_path: str):
-    st_yled.init()
+    st_yled.init(
+    bypass_css_validation = True
+)
 
     updated_themes = get_updated_theme_config()
     config_toml, theme_updates, theme_sidebar_updates = set_config_toml(
@@ -240,7 +242,9 @@ def render_export_theme(config_toml_template_path: str):
 
 
 def render_export_elements():
-    st_yled.init()
+    st_yled.init(
+    bypass_css_validation = True
+)
 
     # Extract all values related to elements from session state
     # Get for those elements the values and related css properties
@@ -252,8 +256,11 @@ def render_export_elements():
 
     for key in st.session_state:
         if key.startswith("element-") and key.endswith("-value"):
+            
             css_prop_format = key.split("-")[-2]
-            element_name = key.split("-")[1]
+            # Take care of variants
+            element_name = key.split("-")[1:-2]
+            element_name = "_".join(element_name)
 
             if element_name not in uiconfig.ELEMENTS_EXCLUDED_FROM_CSS:
                 if element_name not in export_elements:
@@ -363,7 +370,9 @@ def render_export_elements():
 
 
 def render_export_components():
-    st_yled.init()
+    st_yled.init(
+    bypass_css_validation = True
+)
 
     st.markdown(
         """
@@ -437,7 +446,9 @@ def export_config_toml():
 
 @st.dialog("Getting help", width="medium")
 def render_help_dialog():
-    st_yled.init()
+    st_yled.init(
+    bypass_css_validation = True
+)
 
     help_cont = st.container(key="help-dialog-container")
 
@@ -534,7 +545,9 @@ def render_help_dialog():
             You can also copy Python code directly from the editor cards of each element.
 
             :material/notifications: Styling individual elements requires the `st-styled` package available in your Streamlit project.
-            On each of your app pages run `st_yled.init()` to load the configurations from the `st-styled.css`.
+            On each of your app pages run `st_yled.init(
+    bypass_css_validation = True
+)` to load the configurations from the `st-styled.css`.
             """,
                 key="help-dialog-more-on-elements-markdown",
             )
@@ -607,7 +620,9 @@ def render_help_dialog():
 
 @st.dialog("Send your feedback", width="medium")
 def render_feedback_dialog():
-    st_yled.init()
+    st_yled.init(
+    bypass_css_validation = True
+)
 
     # Which features, functions or components are missing?
     st.container(key="feedback-dialog-container")
@@ -686,7 +701,9 @@ Send us your **feedback** and **ideas**!
 
 # region UI
 
-st_yled.init()
+st_yled.init(
+    bypass_css_validation = True
+)
 
 theme_page = st.Page("pages/theme.py", title="Theme")
 element_page = st.Page("pages/elements.py", title="Elements")
@@ -700,7 +717,7 @@ pg = st.navigation([theme_page, element_page, components_page, components_detail
 
 st.set_page_config(page_title="st_yled studio", page_icon="assets/st_yled Logo.png")
 
-st.logo("assets/st_yled_logo_corer.svg", size="large")
+st.logo("assets/st_yled Logo.png", size="large")
 
 if "feedback-submitted" in st.session_state:
     if st.session_state["feedback-submitted"]:
@@ -743,19 +760,20 @@ with st.sidebar.container(key="sidebar-footer-container"):
 
     with st.container(
         key="sidebar-footer-letter-container",
-        horizontal=True,
+        horizontal=False,
         vertical_alignment="center",
         gap="medium",
     ):
-        st.image("assets/logo_small.svg", width=80)
-
+        
         st_yled.markdown(
-            """**styled studio**\n\nwith :heart: from [EVOBYTE](https://evo-byte.com)\n(c)2025-2026""",
+            """**styled studio**\n(c)2025-2026\n""",
             font_size="14px",
             color="#31333F99",
             key="sidebar-footer-logo-side",
             width=80,
         )
+
+        st.image("https://evo-byte.com/wp-content/uploads/2026/04/EVOBYTE-Data-Science-scaled.webp", width=136, link="https://evo-byte.com/")
 
 
 # region HEADER

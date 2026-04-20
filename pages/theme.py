@@ -8,7 +8,9 @@ import utils
 
 import uuid
 
-st_yled.init()
+st_yled.init(
+    bypass_css_validation = True
+)
 
 
 def init_theme_session_state(key: str, default_value: str):
